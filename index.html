@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>心智棱镜 · 16型人格深度测评</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #f8f7ff 0%, #ffffff 100%);
+            color: #1a1a2e;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+        .animate-spin-slow { animation: spin 2s linear infinite; }
+
+        /* Gradient text */
+        .text-gradient {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Card hover */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* Option card */
+        .option-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+        .option-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .option-card.selected {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border-color: #8b5cf6;
+            transform: scale(1.01);
+        }
+
+        /* Progress bar */
+        .progress-fill {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
+        }
+
+        /* Badge shine */
+        .badge-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .badge-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        /* Page transitions - 修复版 */
+        .page { 
+            display: none; 
+            opacity: 0; 
+            min-height: 100vh;
+        }
+        .page.active { 
+            display: block !important; 
+            opacity: 1; 
+            animation: fadeIn 0.4s ease; 
+        }
+
+        /* 结果页特殊修复 */
+        #page-result {
+            position: relative;
+            overflow-x: hidden;
+        }
+        #page-result.active {
+            display: block !important;
+        }
+        #result-hero {
+            position: relative;
+            transform: translateZ(0);
+        }
+
+        /* Radar container */
+        .radar-container { min-height: 280px; }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(139, 92, 246, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #8b5cf6;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Stagger delays */
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 4px; }
+
+        /* Safe area */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        }
+
+        /* Section backgrounds */
+        .bg-hero-gradient {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+        }
+
+        /* Tag styles */
+        .tag {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Share card */
+        .share-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        /* Touch feedback */
+        @media (hover: none) {
+            .touch-feedback:active { opacity: 0.7; }
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            html { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="page-home" class="page active min-h-screen pb-24">
+        <!-- Header -->
+        <header class="px-4 py-3 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-violet-100">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-gray-800 text-sm">心智棱镜</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span id="online-count">1,247</span>人在测
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="px-5 pt-8 pb-6 text-center">
+            <div class="animate-float mb-6">
+                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-200">
+                    <i class="fas fa-brain text-white text-4xl"></i>
+                </div>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-3">
+                <span class="text-gradient">心智棱镜</span>
+                <span class="text-gray-700"> · 16型人格深度测评</span>
+            </h1>
+            <p class="text-gray-500 text-base mb-2">你是否总觉得"没人真正懂你"？</p>
+            <p class="text-gray-600 text-sm leading-relaxed max-w-md mx-auto">
+                60道科学题目，基于荣格八维认知功能理论，穿透你的性格表象，解锁灵魂底色
+            </p>
+        </section>
+
+        <!-- Features -->
+        <section class="px-4 mb-6">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-gray-100 shadow-sm card-hover">
+                    <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-check-circle text-violet-500"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">60道人性化学题</span>
+                </div>
+                <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-gray-100 shadow-sm card-hover">
+                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-shield-alt text-blue-500"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">本地数据隐私无忧</span>
+                </div>
+                <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-gray-100 shadow-sm card-hover">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-alt text-emerald-500"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">32种专属人格解析</span>
+                </div>
+                <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-gray-100 shadow-sm card-hover">
+                    <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-share-alt text-amber-500"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">朋友圈海报级结果</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Highlights -->
+        <section class="px-4 mb-6">
+            <div class="space-y-3">
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-100 shadow-sm card-hover animate-slide-up">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-purple-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-heart text-violet-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-1">精准共情</h3>
+                        <p class="text-sm text-gray-500">拒绝冰冷术语，读懂你的脆弱与光芒</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-100 shadow-sm card-hover animate-slide-up stagger-1">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-purple-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-chart-line text-violet-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-1">心智成长</h3>
+                        <p class="text-sm text-gray-500">不止是测评，更是可落地的提升指南</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-100 shadow-sm card-hover animate-slide-up stagger-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-purple-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-users text-violet-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-1">同频匹配</h3>
+                        <p class="text-sm text-gray-500">找到灵魂伴侣、最佳搭档，告别无效社交</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-100 shadow-sm card-hover animate-slide-up stagger-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-purple-50 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-sparkles text-violet-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-1">颜值满分</h3>
+                        <p class="text-sm text-gray-500">测完忍不住发朋友圈，收获专属认同感</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Info -->
+        <section class="px-4 mb-6">
+            <div class="p-4 rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-100">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fas fa-info-circle text-violet-600"></i>
+                    <span class="font-bold text-violet-800 text-sm">测评须知</span>
+                </div>
+                <ol class="space-y-2 text-sm text-gray-600">
+                    <li class="flex gap-2"><span class="text-violet-500 font-bold">1.</span><span>凭<span class="text-violet-600 font-medium">第一直觉</span>选择，无需纠结，你的本能就是最真实的自己</span></li>
+                    <li class="flex gap-2"><span class="text-violet-500 font-bold">2.</span><span>基于荣格八维+现代心智理论，本土化设计更贴合国人性格</span></li>
+                    <li class="flex gap-2"><span class="text-violet-500 font-bold">3.</span><span>所有数据仅本地运行，不上传服务器，你的秘密只属于你</span></li>
+                    <li class="flex gap-2"><span class="text-violet-500 font-bold">4.</span><span>结果不是标签，而是你认识自己、接纳自己的一把钥匙</span></li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Social Proof -->
+        <section class="px-4 mb-6">
+            <div class="flex justify-around py-4 rounded-xl bg-white border border-gray-100 shadow-sm">
+                <div class="text-center">
+                    <div class="text-xl font-bold text-gradient">4.7w+</div>
+                    <div class="text-xs text-gray-400">付费解锁</div>
+                </div>
+                <div class="w-px bg-gray-200"></div>
+                <div class="text-center">
+                    <div class="text-xl font-bold text-gradient">1.3w+</div>
+                    <div class="text-xs text-gray-400">五星好评</div>
+                </div>
+                <div class="w-px bg-gray-200"></div>
+                <div class="text-center">
+                    <div class="text-xl font-bold text-gradient">98%</div>
+                    <div class="text-xs text-gray-400">准确度</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-lg border-t border-gray-100 safe-area-bottom z-50">
+            <button onclick="startQuiz()" class="w-full btn-primary py-4 rounded-xl text-white font-bold text-lg shadow-lg shadow-violet-300 flex items-center justify-center gap-2 animate-pulse-glow">
+                <span>开启自我探索之旅</span>
+                <i class="fas fa-sparkles"></i>
+            </button>
+            <button onclick="quickTest()" class="w-full mt-2 py-2 text-xs text-gray-400 hover:text-violet-500 transition-colors">
+                ⚡ 快速测试（直接查看结果）
+            </button>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div id="page-quiz" class="page min-h-screen flex flex-col bg-gradient-to-b from-violet-50/50 to-white">
+        <header class="px-4 py-3 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-violet-100">
+            <button onclick="prevQuestion()" id="prev-btn-header" class="flex items-center gap-1 text-gray-600 disabled:text-gray-300 transition-colors" disabled>
+                <i class="fas fa-chevron-left"></i>
+                <span class="text-sm">返回</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <i class="fas fa-save text-violet-500 text-sm"></i>
+                <span class="text-xs text-violet-600">自动保存</span>
+            </div>
+        </header>
+
+        <div class="px-5 pt-6 pb-4">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm text-gray-500">第 <span id="current-num" class="text-violet-600 font-bold text-lg">1</span> 题</span>
+                <span class="text-sm text-gray-400">共 <span id="total-num">60</span> 题</span>
+            </div>
+            <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full progress-fill rounded-full" style="width: 1.67%"></div>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-400">进度自动保存，退出不丢失</span>
+                <span id="progress-percent" class="text-xs text-violet-600 font-medium">2%</span>
+            </div>
+        </div>
+
+        <div class="flex-1 px-5 py-4 flex flex-col">
+            <div id="question-container" class="flex-1">
+                <div class="mb-8">
+                    <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-gray-800 leading-relaxed">加载中...</h2>
+                </div>
+                <div id="options-container" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div class="px-5 py-4 bg-white/80 backdrop-blur-md border-t border-gray-100 safe-area-bottom">
+            <div class="flex gap-3">
+                <button onclick="prevQuestion()" id="prev-btn" class="flex-1 py-3.5 rounded-xl border-2 border-gray-200 text-gray-600 font-medium disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2" disabled>
+                    <i class="fas fa-chevron-left"></i>上一题
+                </button>
+                <button onclick="nextQuestion()" id="next-btn" class="flex-[2] py-3.5 rounded-xl btn-primary text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2" disabled>
+                    下一题<i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载页 -->
+    <div id="page-loading" class="page min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-violet-50 to-white">
+        <div class="relative mb-8">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-200 animate-pulse">
+                <i id="loading-icon" class="fas fa-brain text-white text-4xl"></i>
+            </div>
+            <div class="absolute inset-0 animate-spin-slow">
+                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-violet-400 rounded-full"></div>
+            </div>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">正在解析你的心智光谱...</h2>
+        <p id="loading-text" class="text-sm text-gray-500 mb-8 flex items-center gap-2">
+            <i class="fas fa-brain text-violet-500"></i>正在计算八维认知功能...
+        </p>
+        <div class="w-full max-w-xs">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs text-gray-400">分析进度</span>
+                <span id="loading-percent" class="text-sm font-bold text-violet-600">0%</span>
+            </div>
+            <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div id="loading-bar" class="h-full bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-8" id="step-indicators"></div>
+        <p class="mt-12 text-xs text-gray-400 max-w-xs text-center">
+            基于荣格八维认知功能理论，结合大五人格模型，为你生成科学准确的人格分析报告
+        </p>
+    </div>
+
+    <!-- 结果页（优化版） -->
+    <div id="page-result" class="page min-h-screen pb-20 bg-gradient-to-b from-violet-50/30 to-white">
+        <!-- Hero Card -->
+        <div id="result-hero" class="px-5 pt-2 pb-6 rounded-b-[2rem] bg-hero-gradient text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
+            </div>
+            <div class="relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md mb-2">
+                    <i class="fas fa-sparkles text-sm"></i>
+                    <span id="stage-badge" class="text-sm font-medium">💫 沉睡者</span>
+                </div>
+                <h1 id="mbti-type" class="text-5xl sm:text-6xl font-black mb-2 tracking-wider">INTP</h1>
+                <p id="type-nickname" class="text-xl text-violet-100 mb-3">逻辑构建者</p>
+                <div class="flex justify-center gap-2 mb-6 flex-wrap">
+                    <span id="stage-tag" class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">初阶·白银</span>
+                    <span id="energy-tag" class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">高能级</span>
+                    <span id="tf-tag" class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">理性型(T)</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 max-w-xs mx-auto">
+                    <div class="text-sm text-violet-100 mb-1">心智总分</div>
+                    <div class="text-4xl font-bold mb-1"><span id="total-score">0</span><span class="text-lg text-violet-200">/600</span></div>
+                    <div class="text-xs text-violet-200">能量指数: <span id="energy-score" class="text-white font-bold">0</span>/100</div>
+                </div>
+                <p id="golden-quote" class="mt-6 text-lg italic text-violet-100 font-light leading-relaxed max-w-md mx-auto">"在逻辑的迷宫中，我寻找着真理的灯塔。"</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="result-content" class="px-5 py-6 space-y-6">
+            <!-- 灵魂独白 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-slide-up">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-brain text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">灵魂独白</h3>
+                </div>
+                <p id="soul-monologue" class="text-gray-600 text-sm leading-relaxed"></p>
+            </section>
+
+            <!-- 核心力量 -->
+            <div class="grid grid-cols-2 gap-4">
+                <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-slide-up stagger-1">
+                    <div class="text-violet-500 text-2xl mb-2"><i class="fas fa-bolt"></i></div>
+                    <h4 class="font-bold text-gray-800 mb-2 text-sm">超能力觉醒</h4>
+                    <p id="super-power" class="text-xs text-gray-500 leading-relaxed"></p>
+                </section>
+                <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-slide-up stagger-2">
+                    <div class="text-amber-500 text-2xl mb-2"><i class="fas fa-gem"></i></div>
+                    <h4 class="font-bold text-gray-800 mb-2 text-sm">高阶特质</h4>
+                    <p id="high-trait" class="text-xs text-gray-500 leading-relaxed"></p>
+                </section>
+            </div>
+
+            <!-- 雷达图 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-slide-up stagger-3">
+                <div class="flex items-center gap-2 mb-6">
+                    <i class="fas fa-bullseye text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">心智 & 人格可视化</h3>
+                </div>
+                <div class="space-y-8">
+                    <div><div class="text-xs text-gray-400 mb-2 text-center">五维心智发展指数</div><div id="radar-mind" class="radar-container w-full h-64"></div></div>
+                    <div class="border-t border-gray-100 pt-6"><div class="text-xs text-gray-400 mb-2 text-center">四维人格倾向指数</div><div id="radar-mbti" class="radar-container w-full h-64"></div></div>
+                    <div class="border-t border-gray-100 pt-6"><div class="text-xs text-gray-400 mb-2 text-center">八维认知功能强度</div><div id="radar-cognitive" class="radar-container w-full h-48"></div></div>
+                </div>
+            </section>
+
+            <!-- 能量解析 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-slide-up">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-battery-three-quarters text-green-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">能量解析</h3>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <div><div class="text-sm text-gray-400">当前能级</div><div id="energy-level-text" class="text-2xl font-bold text-violet-600">高能级</div></div>
+                    <div class="text-right"><div class="text-sm text-gray-400">适配指数</div><div id="adapt-index" class="text-2xl font-bold text-gray-800">87%</div></div>
+                </div>
+                <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="energy-bar" class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full transition-all duration-1000" style="width: 75%"></div>
+                </div>
+                <p id="energy-desc" class="mt-4 text-sm text-gray-600 leading-relaxed"></p>
+            </section>
+
+            <!-- 等级勋章 -->
+            <section class="text-center py-4 animate-slide-up">
+                <div class="inline-block badge-shine rounded-2xl p-1 bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300">
+                    <div class="bg-white rounded-xl px-8 py-4">
+                        <div class="text-xs text-gray-400 mb-1">当前等级</div>
+                        <div id="rank-title" class="text-2xl font-bold text-gradient-gold">心智精英</div>
+                        <div id="rank-star" class="text-amber-400 text-sm mt-1">★★★☆☆</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 高光与成长 -->
+            <div class="space-y-4">
+                <section class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-amber-400 animate-slide-up">
+                    <div class="flex items-center gap-2 mb-3 text-amber-600">
+                        <i class="fas fa-star text-lg"></i>
+                        <h4 class="font-bold">你的专属高光</h4>
+                    </div>
+                    <ul id="highlights" class="space-y-2"></ul>
+                </section>
+                <section class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-violet-400 animate-slide-up">
+                    <div class="flex items-center gap-2 mb-3 text-violet-600">
+                        <i class="fas fa-seedling text-lg"></i>
+                        <h4 class="font-bold">成长方向</h4>
+                    </div>
+                    <ul id="growth-areas" class="space-y-2"></ul>
+                </section>
+            </div>
+
+            <!-- 进化秘方 -->
+            <section class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 border border-violet-100 animate-slide-up">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-award text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">进化秘方</h3>
+                </div>
+                <div class="space-y-4">
+                    <div><div class="text-xs text-violet-600 mb-1">当前阶段目标</div><div id="stage-goal" class="text-sm font-medium text-gray-700"></div></div>
+                    <div><div class="text-xs text-violet-600 mb-1">落地方法</div><div id="action-steps" class="text-sm text-gray-600 space-y-1"></div></div>
+                </div>
+            </section>
+
+            <!-- 场景化适配 -->
+            <section class="space-y-4">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2 px-1"><i class="fas fa-map-marked-alt text-violet-500 text-lg"></i>场景化适配指南</h3>
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center"><i class="fas fa-briefcase text-blue-500"></i></div>
+                        <div><div class="font-bold text-gray-800">职场适配</div><div class="text-xs text-gray-400">核心竞争力</div></div>
+                    </div>
+                    <p id="career-guide" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center"><i class="fas fa-heart text-pink-500"></i></div>
+                        <div><div class="font-bold text-gray-800">亲密关系</div><div class="text-xs text-gray-400">相处之道</div></div>
+                    </div>
+                    <p id="relationship-guide" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center"><i class="fas fa-users text-green-500"></i></div>
+                        <div><div class="font-bold text-gray-800">社交适配</div><div class="text-xs text-gray-400">圈子选择</div></div>
+                    </div>
+                    <p id="social-guide" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+            </section>
+
+            <!-- 同频灵魂 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-user-plus text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">同频灵魂匹配</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-pink-50">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">💕</span>
+                            <div><div class="text-sm font-bold text-gray-800">灵魂伴侣</div><div id="soul-mate" class="text-xs text-gray-500"></div></div>
+                        </div>
+                        <div class="text-right"><div class="text-pink-500 font-bold">95%</div><div class="text-[10px] text-gray-400">匹配度</div></div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-blue-50">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🤝</span>
+                            <div><div class="text-sm font-bold text-gray-800">最佳搭档</div><div id="work-partner" class="text-xs text-gray-500"></div></div>
+                        </div>
+                        <div class="text-right"><div class="text-blue-500 font-bold">88%</div><div class="text-[10px] text-gray-400">协同度</div></div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-green-50">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">☕</span>
+                            <div><div class="text-sm font-bold text-gray-800">知心朋友</div><div id="best-friend" class="text-xs text-gray-500"></div></div>
+                        </div>
+                        <div class="text-right"><div class="text-green-500 font-bold">82%</div><div class="text-[10px] text-gray-400">默契度</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 天赋赛道 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-rocket text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">天赋赛道 · 职业锚</h3>
+                </div>
+                <div id="career-tags" class="flex flex-wrap gap-2"></div>
+            </section>
+
+            <!-- 7天清单 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-calendar-check text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">7天心智提升清单</h3>
+                </div>
+                <div id="checklist" class="space-y-2"></div>
+            </section>
+
+            <!-- 深度分析 -->
+            <section class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 border border-violet-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-microscope text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">深度人格分析</h3>
+                </div>
+                <div id="deep-analysis" class="space-y-4 text-sm text-gray-600 leading-relaxed"></div>
+            </section>
+
+            <!-- 压力应对 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-shield-alt text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">压力应对指南</h3>
+                </div>
+                <div id="stress-guide" class="space-y-3 text-sm text-gray-600 leading-relaxed"></div>
+            </section>
+
+            <!-- 沟通风格 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-comments text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">你的沟通风格</h3>
+                </div>
+                <div id="communication-style" class="text-sm text-gray-600 leading-relaxed"></div>
+            </section>
+
+            <!-- 学习建议 -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-graduation-cap text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">专属学习建议</h3>
+                </div>
+                <div id="learning-tips" class="space-y-3 text-sm text-gray-600 leading-relaxed"></div>
+            </section>
+
+            <!-- 分享 -->
+            <section class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 border border-violet-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-share-alt text-violet-500 text-lg"></i>
+                    <h3 class="font-bold text-gray-800">分享我的灵魂报告</h3>
+                </div>
+                <div id="share-texts" class="space-y-3"></div>
+            </section>
+        </div>
+
+        <!-- Fixed Bottom Buttons -->
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-lg border-t border-gray-100 safe-area-bottom z-50">
+            <div class="flex gap-3">
+                <button onclick="resetQuiz()" class="flex-1 py-3.5 rounded-xl border-2 border-gray-200 text-gray-600 font-medium active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-redo"></i>重新探索
+                </button>
+                <button onclick="shareReport()" class="flex-[2] py-3.5 rounded-xl btn-primary text-white font-bold active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-share"></i>分享报告
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-end sm:items-center justify-center" onclick="closeShareModal()">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-sm animate-slide-up" onclick="event.stopPropagation()">
+            <h3 class="font-bold text-lg mb-4 text-center">分享你的结果</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="downloadImage()" class="p-4 rounded-xl bg-violet-50 text-violet-700 flex flex-col items-center gap-2">
+                    <i class="fas fa-download text-2xl"></i>
+                    <span class="text-sm font-medium">保存图片</span>
+                </button>
+                <button onclick="copyShareText()" class="p-4 rounded-xl bg-blue-50 text-blue-700 flex flex-col items-center gap-2">
+                    <i class="fas fa-copy text-2xl"></i>
+                    <span class="text-sm font-medium">复制文案</span>
+                </button>
+            </div>
+            <button onclick="closeShareModal()" class="w-full mt-4 py-3 rounded-xl bg-gray-100 text-gray-600 font-medium">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据配置 ====================
+        const questions = [
+            {id: 1, text: "周末朋友突然约你出去玩，你第一反应是？", options: [{text: "好啊！立马收拾出门", score: {E:3, Se:1, Fe:1}}, {text: "先问清楚去哪、几个人，再决定", score: {I:3, Ni:1, Ti:1}}]},
+            {id: 2, text: "开会时，你更喜欢哪种发言方式？", options: [{text: "想到什么说什么，边说边整理思路", score: {E:3, Ne:2, Te:1}}, {text: "先在脑子里过一遍，组织好语言再说", score: {I:3, Ni:2, Ti:1}}]},
+            {id: 3, text: "如果可以选择办公地点，你会选？", options: [{text: "开放式工位，随时能和大家聊天", score: {E:3, Fe:1}}, {text: "独立办公室或安静的角落", score: {I:3, Ti:1}}]},
+            {id: 4, text: "加了个新群，你通常？", options: [{text: "主动冒泡，发个表情包混脸熟", score: {E:3, Se:1, Fe:1}}, {text: "潜水观察几天，再决定说不说话", score: {I:3, Ni:1, Fi:1}}]},
+            {id: 5, text: "小组作业讨论时，你的角色是？", options: [{text: "活跃分子，抛点子带节奏", score: {E:3, Te:1, Fe:1}}, {text: "倾听者，关键时刻总结一下", score: {I:3, Ti:1, Fi:1}}]},
+            {id: 6, text: "难得的周末，你更想？", options: [{text: "约朋友吃饭、逛街、剧本杀", score: {E:3, Se:2}}, {text: "自己在家看书、打游戏、发呆", score: {I:3, Ni:2, Si:1}}]},
+            {id: 7, text: "和别人意见不合时，你倾向于？", options: [{text: "当场掰扯清楚，谁对听谁的", score: {E:3, Te:2}}, {text: "先放一放，回头微信聊或写下来", score: {I:3, Ti:2, Fi:1}}]},
+            {id: 8, text: "哪种状态让你更享受？", options: [{text: "一群人头脑风暴，灵感乱飞", score: {E:3, Ne:2}}, {text: "一个人安安静静想事情", score: {I:3, Ni:2, Si:1}}]},
+            {id: 9, text: "在聚会上，你通常是？", options: [{text: "热场子的人，到处都能聊", score: {E:3, Fe:2, Se:1}}, {text: "坐在角落观察大家的人", score: {I:3, Ni:2, Ti:1}}]},
+            {id: 10, text: "累了一天，怎么恢复能量？", options: [{text: "找朋友吐吐槽，吃顿好的", score: {E:3}}, {text: "一个人静静，听音乐或散步", score: {I:3}}]},
+            {id: 11, text: "同时接到好几个任务，你习惯？", options: [{text: "多线并进，哪个催得紧先做哪个", score: {E:3, Ne:1}}, {text: "按顺序一个个来，做完一个再做下一个", score: {I:3, Ni:1, Si:1}}]},
+            {id: 12, text: "手机突然响了，你第一反应是？", options: [{text: "赶紧看看是谁，说不定有好事", score: {E:3, Se:1}}, {text: "心里一紧，希望不是找麻烦的", score: {I:3}}]},
+            {id: 13, text: "参加派对时，你更愿意？", options: [{text: "到处走动，认识新朋友", score: {E:3, Fe:1}}, {text: "找一两个熟人深度聊天", score: {I:3, Fi:1}}]},
+            {id: 14, text: "别人怎么形容你？", options: [{text: "开朗外向，行动派", score: {E:3, Te:1, Se:1}}, {text: "内向沉稳，思考者", score: {I:3, Ti:1, Ni:1}}]},
+            {id: 15, text: "你最怕哪种情况？", options: [{text: "独自一人，没人说话", score: {E:3}}, {text: "周围太吵，没法安静", score: {I:3}}]},
+            {id: 16, text: "看一部电影，你更容易记住？", options: [{text: "具体的台词、场景、服装细节", score: {S:3, Si:2, Se:1}}, {text: "整体的氛围、隐喻、想表达的主题", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 17, text: "学新东西时，你喜欢？", options: [{text: "从最基础的开始，一步一步来", score: {S:3, Si:2}}, {text: "先了解大概框架，再慢慢填细节", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 18, text: "做判断时，你更相信？", options: [{text: "实际数据、案例、亲身经验", score: {S:3, Te:1, Si:1}}, {text: "直觉、灵感、第六感", score: {N:3, Ni:2, Fi:1}}]},
+            {id: 19, text: "你更擅长？", options: [{text: "动手做具体的事情", score: {S:3, Te:1, Se:1}}, {text: "构思抽象的概念", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 20, text: "读书时，你更关注？", options: [{text: "字面信息和事实陈述", score: {S:3, Si:1}}, {text: "字里行间的暗示和深层含义", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 21, text: "你喜欢哪种艺术作品？", options: [{text: "写实派，细节栩栩如生", score: {S:3, Si:1}}, {text: "抽象派，给人想象空间", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 22, text: "做决策时，你更依赖？", options: [{text: "过去类似事情的经验", score: {S:3, Si:2, Te:1}}, {text: "对未来的预感和可能性", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 23, text: "你更享受哪种体验？", options: [{text: "美食、按摩、旅行等当下感官享受", score: {S:3, Se:2}}, {text: "想象未来的美好生活", score: {N:3, Ni:2, Ne:1}}]},
+            {id: 24, text: "你更擅长记住？", options: [{text: "人名、日期、地点等具体信息", score: {S:3, Si:2}}, {text: "概念、理论、模式", score: {N:3, Ni:1, Ne:1}}]},
+            {id: 25, text: "你喜欢的工作是？", options: [{text: "流程清晰、标准明确", score: {S:3, Si:2, Te:1}}, {text: "需要创意、不断探索", score: {N:3, Ne:2, Ni:1}}]},
+            {id: 26, text: "聊天时，你更关注？", options: [{text: "对方说了什么事实", score: {S:3, Te:1}}, {text: "对方没说的潜台词", score: {N:3, Ne:2, Ni:1}}]},
+            {id: 27, text: "旅行前，你会？", options: [{text: "做详细攻略，订好所有酒店", score: {S:3, Si:1, Te:1, J:2}}, {text: "只定机票，到了再看心情逛", score: {N:3, Ne:2, P:2}}]},
+            {id: 28, text: "你更相信哪种认知？", options: [{text: "亲眼所见、亲耳所闻", score: {S:3, Se:2}}, {text: "内心的直觉和预感", score: {N:3, Ni:2}}]},
+            {id: 29, text: "你更擅长处理？", options: [{text: "具体、实际的问题", score: {S:3, Te:2, Se:1}}, {text: "复杂、抽象的理论", score: {N:3, Ti:2, Ni:1}}]},
+            {id: 30, text: "你喜欢看哪类书？", options: [{text: "人物传记、历史纪实、实用手册", score: {S:3, Si:1}}, {text: "科幻小说、哲学、奇幻文学", score: {N:3, Ne:2, Ni:1}}]},
+            {id: 31, text: "做重要决定时，你更看重？", options: [{text: "是否符合逻辑、公平合理", score: {T:3, Ti:2, Te:1}}, {text: "是否符合自己的价值观、人情味", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 32, text: "你更自豪自己哪一点？", options: [{text: "理性客观，不感情用事", score: {T:3, Ti:2, Te:1}}, {text: "善解人意，懂得照顾别人感受", score: {F:3, Fi:1, Fe:2}}]},
+            {id: 33, text: "评价一个方案时，你首先看？", options: [{text: "效率高不高、能不能落地", score: {T:3, Te:2}}, {text: "对相关人员的影响好不好", score: {F:3, Fe:2, Fi:1}}]},
+            {id: 34, text: "什么更容易说服你？", options: [{text: "数据、图表、严密的论证", score: {T:3, Ti:2, Te:1}}, {text: "感人的故事、真实的经历", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 35, text: "被别人批评时，你更在意？", options: [{text: "他说的有没有道理、对不对", score: {T:3, Ti:1}}, {text: "他说话的态度和语气", score: {F:3, Fi:2}}]},
+            {id: 36, text: "你更欣赏哪种人？", options: [{text: "能力强、有魄力", score: {T:3, Te:1}}, {text: "心地善良、有爱心", score: {F:3, Fe:1, Fi:1}}]},
+            {id: 37, text: "处理矛盾时，你更倾向于？", options: [{text: "就事论事，分清对错", score: {T:3, Te:2, Ti:1}}, {text: "照顾各方情绪，尽量和气", score: {F:3, Fe:2, Fi:1}}]},
+            {id: 38, text: "你最受不了什么？", options: [{text: "逻辑不通、自相矛盾", score: {T:3, Ti:2}}, {text: "人际关系紧张、勾心斗角", score: {F:3, Fe:2}}]},
+            {id: 39, text: "你更擅长？", options: [{text: "分析拆解问题", score: {T:3, Ti:2, Te:1}}, {text: "体谅理解别人", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 40, text: "你更重视？", options: [{text: "真理和公正", score: {T:3, Ti:2}}, {text: "和谐与包容", score: {F:3, Fe:2, Fi:1}}]},
+            {id: 41, text: "争论时，你通常会？", options: [{text: "坚持正确观点，哪怕伤感情", score: {T:3, Ti:2, Te:1}}, {text: "维持关系更重要，可以退一步", score: {F:3, Fe:2, Fi:1}}]},
+            {id: 42, text: "你喜欢哪类电影？", options: [{text: "悬疑推理、烧脑科幻", score: {T:3, Ti:2, Ni:1}}, {text: "温情剧情、浪漫爱情", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 43, text: "你更愿意别人夸你？", options: [{text: "聪明、有头脑", score: {T:3, Ti:2, Te:1}}, {text: "善良、温暖", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 44, text: "工作中，你更关注？", options: [{text: "任务能不能按时完成", score: {T:3, Te:2}}, {text: "团队氛围好不好", score: {F:3, Fe:2}}]},
+            {id: 45, text: "你更相信？", options: [{text: "理性的分析判断", score: {T:3, Ti:2, Te:1}}, {text: "内心的情感直觉", score: {F:3, Fi:2, Fe:1}}]},
+            {id: 46, text: "你更喜欢哪种生活方式？", options: [{text: "有计划、有条理，按部就班", score: {J:3, Te:2, Si:1}}, {text: "灵活自由，随性而为", score: {P:3, Ne:2, Se:1}}]},
+            {id: 47, text: "面对截止日期，你通常？", options: [{text: "提前做完，不慌不忙", score: {J:3, Te:2, Si:1}}, {text: "最后时刻效率最高", score: {P:3, Ne:1, Se:1}}]},
+            {id: 48, text: "你的办公桌/房间通常是？", options: [{text: "整整齐齐，东西都在固定位置", score: {J:3, Si:2, Te:1}}, {text: "有点乱，但自己找得到东西", score: {P:3, Ne:1, Ti:1}}]},
+            {id: 49, text: "旅行前，你会？", options: [{text: "做好详细攻略，酒店门票全订好", score: {J:3, Te:2, Si:1}}, {text: "只定机票，到了再决定怎么玩", score: {P:3, Ne:2, Se:1}}]},
+            {id: 50, text: "你更享受哪种感觉？", options: [{text: "完成任务的成就感", score: {J:3, Te:2}}, {text: "探索过程中的新鲜感", score: {P:3, Ne:2, Se:1}}]},
+            {id: 51, text: "面对突如其来的变化，你？", options: [{text: "有点烦躁，需要时间适应", score: {J:3, Si:2}}, {text: "兴奋，觉得很有意思", score: {P:3, Ne:2, Se:1}}]},
+            {id: 52, text: "你更喜欢哪种工作模式？", options: [{text: "目标明确，按时交付", score: {J:3, Te:2}}, {text: "弹性工作，看灵感", score: {P:3, Ne:2, Fi:1}}]},
+            {id: 53, text: "你的待办清单通常是？", options: [{text: "列出来并一一打勾完成", score: {J:3, Te:2, Si:1}}, {text: "列了，但经常不按顺序来", score: {P:3, Ne:1}}]},
+            {id: 54, text: "做决定时，你更希望？", options: [{text: "尽快定下来，不再更改", score: {J:3, Te:1, Si:1}}, {text: "保持开放，随时可以调整", score: {P:3, Ne:2, Ni:1}}]},
+            {id: 55, text: "你更喜欢哪种状态？", options: [{text: "事情已经定了，心里踏实", score: {J:3, Te:1, Si:1}}, {text: "还有很多选择，未来可期", score: {P:3, Ne:2, Se:1}}]},
+            {id: 56, text: "项目管理中，你更擅长？", options: [{text: "规划、组织、跟进", score: {J:3, Te:2, Si:1}}, {text: "创意、应变、启动", score: {P:3, Ne:2, Se:1}}]},
+            {id: 57, text: "你更讨厌？", options: [{text: "混乱无序、没有章法", score: {J:3, Si:2, Te:1}}, {text: "条条框框、束缚太多", score: {P:3, Ne:2, Se:1}}]},
+            {id: 58, text: "周末计划突然被打乱，你会？", options: [{text: "有点烦躁，想重新规划", score: {J:3, Si:2, Te:1}}, {text: "无所谓，正好可以随意", score: {P:3, Ne:2, Se:1}}]},
+            {id: 59, text: "你更倾向哪种做事方式？", options: [{text: "按既定步骤来", score: {J:3, Si:2, Te:1}}, {text: "看情况，随机应变", score: {P:3, Ne:2, Se:1}}]},
+            {id: 60, text: "工作完成得好，标准是？", options: [{text: "按计划交付，质量达标", score: {J:3, Te:2, Si:1}}, {text: "过程有收获，有新发现", score: {P:3, Ne:2, Ni:1}}]}
+        ];
+
+        const mbtiData = {
+            "INTP": {
+                nickname: "逻辑构建者",
+                monologue: "你是一个天生的思考者，拥有敏锐的洞察力和强大的逻辑分析能力。在你的世界里，事物必须经得起理性的推敲，你热衷于探索抽象理论和复杂系统，常常沉浸在自己的思维宇宙中。你对知识有着纯粹的渴望，不为功利，只为理解事物运行的本质规律。",
+                superPower: "系统性思维与概念化能力，能够快速建立复杂模型，发现事物间的隐藏联系。你擅长将碎片信息整合成完整的知识体系。",
+                highTrait: "追求真理的纯粹性，不受世俗标准束缚，保持思想的独立性。你敢于质疑权威，坚持自己认为正确的观点。",
+                careers: ["战略咨询", "系统架构师", "数据科学家", "理论研究员", "哲学家", "算法工程师", "产品经理"],
+                soulMate: "ENFJ",
+                workPartner: "ENTJ",
+                bestFriend: "INFP",
+                quote: "在逻辑的迷宫中，我寻找着真理的灯塔。",
+                cognitive: {Ti: 45, Ne: 40, Si: 25, Fe: 15, Te: 20, Ni: 30, Se: 10, Fi: 20},
+                deepAnalysis: "作为INTP，你的主导功能是内向思考(Ti)，这让你成为一个天生的分析者。你倾向于在内心构建复杂的理论框架，然后用外向直觉(Ne)来探索各种可能性。你的思维像一张巨大的网络，能够将看似无关的概念连接起来。然而，你的劣势功能外向情感(Fe)可能让你在社交场合感到不适，你可能难以理解或表达自己的情绪，也不太擅长察言观色。这并不意味着你没有情感，而是你更倾向于用逻辑来处理情感问题。在压力下，你可能会过度分析，陷入\"分析瘫痪\"。",
+                stressResponse: "当面临压力时，你倾向于退缩到自己的内心世界，过度分析问题而难以采取行动。你可能会变得异常挑剔，对自己和他人都要求过高。建议：设定\"思考截止时间\"，强迫自己在规定时间内做出决定；通过写作或与他人讨论来整理思绪；进行适度的身体运动来平衡过度活跃的头脑。",
+                communication: "你的沟通风格直接、逻辑性强，喜欢用精确的词汇表达复杂的概念。你可能不擅长闲聊，更倾向于深度讨论。在沟通时，你更注重内容而非形式，有时会忽略对方的情感需求。建议：在表达观点前先确认对方的理解程度；学会用\"我感受到...\"的句式来表达情感；给对方留出回应的空间。",
+                learning: "你最适合通过自主探索、阅读理论书籍、参与深度讨论来学习。你喜欢理解\"为什么\"而不仅仅是\"怎么做\"。建议：选择能够激发你好奇心的学习材料；建立知识图谱来整理所学内容；找到学习伙伴进行思想碰撞；给自己足够的独立思考时间。"
+            },
+            "INTJ": {
+                nickname: "战略大师",
+                monologue: "你拥有深邃的洞察力和强大的战略思维，善于看到事物的本质和未来趋势。你追求效率和完美，对自己和他人都有很高的标准，是天生的愿景规划者。你不喜欢浪费时间在无意义的事情上，总是朝着既定目标稳步前进。",
+                superPower: "长远战略规划与系统优化能力，能够预见未来并制定可行路径。你擅长将复杂的目标拆解为可执行的步骤。",
+                highTrait: "坚定的意志力与执行力，将愿景转化为现实的决心。一旦确定目标，你会全力以赴，不轻易放弃。",
+                careers: ["战略顾问", "投资分析师", "产品经理", "企业高管", "建筑师", "系统设计师", "科学家"],
+                soulMate: "ENFP",
+                workPartner: "ENTP",
+                bestFriend: "INFJ",
+                quote: "我看见未来的轮廓，并用逻辑将它铸造成现实。",
+                cognitive: {Ni: 45, Te: 40, Fi: 25, Se: 15, Ti: 30, Ne: 20, Si: 10, Fe: 15},
+                deepAnalysis: "作为INTJ，你的主导功能是内向直觉(Ni)，这赋予你一种近乎预言般的洞察力。你能够在大脑中模拟未来的各种可能性，并选择最优路径。你的辅助功能外向思考(Te)让你能够高效地执行计划，将愿景变为现实。你的第三功能内向情感(Fi)虽然发展较晚，但一旦成熟，会让你拥有坚定的价值观和道德准则。你的劣势功能外向感觉(Se)可能让你忽视当下的感官体验和细节。",
+                stressResponse: "压力下你可能变得固执己见，过度控制周围的环境，或者突然沉迷于感官享乐（如暴饮暴食、冲动购物）。建议：学会接受不确定性；允许自己偶尔\"浪费\"时间；通过冥想或瑜伽来连接当下；寻求信任的人倾诉。",
+                communication: "你的沟通简洁高效，直奔主题，不喜欢拐弯抹角。你可能显得冷漠或傲慢，尽管你并无此意。建议：在提出批评前先肯定对方的努力；学会用更温和的方式表达不同意见；主动询问对方的想法和感受。",
+                learning: "你适合通过设定明确目标、制定学习计划、独立研究来学习。你需要看到知识与实际目标的关联。建议：为每个学习阶段设定可量化的目标；寻找能够挑战你思维的学习材料；定期回顾和调整学习策略。"
+            },
+            "INFJ": {
+                nickname: "灵魂引路人",
+                monologue: "你拥有罕见的同理心和洞察力，能够深刻理解他人的情感和需求。你追求意义和使命感，渴望帮助他人成长，是理想主义与实用主义的完美结合。你常常能感知到他人未言明的痛苦和潜力。",
+                superPower: "深度共情与直觉洞察，能够感知他人未言明的需求和潜力。你擅长在混乱中看到秩序，在黑暗中看到希望。",
+                highTrait: "坚定的理想主义与行动力，将愿景转化为现实的桥梁。你不仅有梦想，更有实现梦想的毅力和方法。",
+                careers: ["心理咨询师", "人力资源总监", "作家", "教育家", "非营利组织领导者", "社会工作者", "艺术家"],
+                soulMate: "ENTP",
+                workPartner: "INTJ",
+                bestFriend: "INFP",
+                quote: "我理解你的沉默，也看见你灵魂的光芒。",
+                cognitive: {Ni: 45, Fe: 40, Ti: 25, Se: 15, Fi: 30, Ne: 20, Si: 10, Te: 15},
+                deepAnalysis: "作为INFJ，你的主导功能是内向直觉(Ni)与外向情感(Fe)的完美结合。这让你既能洞察深层模式，又能敏锐感知他人的情感状态。你常常能\"感觉\"到别人需要什么，即使对方没有明说。你的第三功能内向思考(Ti)让你能够客观地分析情况，而你的劣势功能外向感觉(Se)可能让你在压力下过度关注细节或沉迷于感官体验。",
+                stressResponse: "压力下你可能变得过度敏感，容易吸收他人的负面情绪，或者突然变得极度挑剔。建议：建立清晰的个人边界，学会说\"不\"；定期进行自我关怀活动；通过写日记来处理复杂的情感；寻求专业的心理支持。",
+                communication: "你的沟通富有同理心，善于倾听，能够让人感到被理解。但有时你可能过于委婉，不敢直接表达真实想法。建议：在保持同理心的同时，学会直接表达自己的需求；不要过度承担他人的情绪；确认自己的理解是否准确。",
+                learning: "你适合通过与人交流、参与有意义的项目、探索人文社科知识来学习。你需要感到所学内容与更高目标相关。建议：选择能够激发你使命感的学习主题；与他人组成学习小组；将所学应用于帮助他人的实践中。"
+            },
+            "INFP": {
+                nickname: "理想主义者",
+                monologue: "你拥有丰富的内心世界和强烈的个人价值观。你追求真实和意义，对美和和谐有着敏锐的感知。虽然外表温和，但内心有着坚定的信念。你是生活中的诗人，能够在平凡中发现不平凡。",
+                superPower: "创造性表达与价值整合，能够将抽象理念转化为动人作品。你拥有独特的视角和深刻的情感深度。",
+                highTrait: "忠于自我的勇气，在世俗压力下保持本真。你不会为了迎合他人而背叛自己的内心。",
+                careers: ["作家", "艺术家", "心理咨询师", "设计师", "社会工作者", "音乐家", "摄影师"],
+                soulMate: "ENFJ",
+                workPartner: "ENTJ",
+                bestFriend: "INFJ",
+                quote: "在我的内心花园里，每一朵花都有它的名字和故事。",
+                cognitive: {Fi: 45, Ne: 40, Si: 25, Te: 15, Ti: 30, Ni: 20, Se: 10, Fe: 20},
+                deepAnalysis: "作为INFP，你的主导功能是内向情感(Fi)，这让你拥有极其丰富和深刻的内心世界。你的价值观是你的指南针，你会不惜一切代价捍卫自己认为正确的事情。你的辅助功能外向直觉(Ne)让你能够看到无限的可能性，但也可能让你难以专注于一件事情。你的劣势功能外向思考(Te)可能让你在需要果断决策时感到困难。",
+                stressResponse: "压力下你可能变得自我批评，过度理想化导致失望，或者突然变得异常挑剔和批判。建议：接受不完美是生活的一部分；设定小而可实现的目标；通过创作来表达和处理情感；与理解你的人分享内心。",
+                communication: "你的沟通真诚、富有感染力，善于用比喻和故事来表达。你可能避免冲突，有时会压抑真实感受。建议：学会在保持和谐的同时表达不同意见；不要假设别人知道你的感受；给自己时间整理思绪再表达。",
+                learning: "你适合通过探索感兴趣的领域、创造性项目、独立研究来学习。你需要感到学习是自我表达的一部分。建议：追随好奇心，不强迫自己学习不感兴趣的内容；用写作或艺术创作来加深理解；找到学习的内在动机。"
+            },
+            "ISTJ": {
+                nickname: "可靠守护者",
+                monologue: "你以责任感和可靠性著称，重视传统和秩序。你注重细节，做事有条不紊，是团队中值得信赖的基石。你的承诺就是契约，一旦答应的事情，你一定会全力以赴完成。",
+                superPower: "系统化执行与细节管理，确保复杂项目准确无误地完成。你擅长建立和维护高效的系统。",
+                highTrait: "坚定不移的诚信与责任感，稳定可靠的存在。在任何情况下，你都能保持冷静和专业。",
+                careers: ["会计师", "审计师", "项目经理", "法务专员", "质量控制", "系统管理员", "军官"],
+                soulMate: "ESFP",
+                workPartner: "ESTJ",
+                bestFriend: "ISFJ",
+                quote: "责任不是负担，而是我存在的基石。",
+                cognitive: {Si: 45, Te: 40, Fi: 25, Ne: 15, Ti: 30, Se: 20, Ni: 10, Fe: 15},
+                deepAnalysis: "作为ISTJ，你的主导功能是内向感觉(Si)，这让你拥有出色的记忆力和对细节的敏锐观察。你重视经验和已验证的方法，相信\"如果它没有坏，就不要修\"。你的辅助功能外向思考(Te)让你能够高效地组织和执行任务。你的第三功能内向情感(Fi)赋予你坚定的个人价值观，而你的劣势功能外向直觉(Ne)可能让你对变化和新事物感到不安。",
+                stressResponse: "压力下你可能变得过度固执，拒绝任何改变，或者突然产生各种灾难性的想法。建议：学会接受适度的变化；给自己时间适应新环境；通过运动或手工活动来释放压力；与信任的人讨论担忧。",
+                communication: "你的沟通直接、具体、注重事实。你可能不擅长表达情感，有时显得过于严肃。建议：在传达信息时考虑对方的感受；学会用更温和的方式提出批评；偶尔分享一些个人感受来建立更深连接。",
+                learning: "你适合通过系统学习、实践操作、循序渐进的方式来学习。你需要清晰的结构和明确的目标。建议：制定详细的学习计划；通过反复练习来巩固知识；将新知识与已有经验联系起来。"
+            },
+            "ISFJ": {
+                nickname: "温暖守护者",
+                monologue: "你拥有无私的奉献精神和细腻的观察力，总能察觉他人的需求并默默付出。你重视和谐与稳定，是群体中的温暖港湾。你的关怀不是轰轰烈烈的，而是渗透在日常生活的点点滴滴中。",
+                superPower: "细致关怀与实务支持，创造舒适和谐的环境。你擅长记住他人的喜好和需求，让人感到被珍视。",
+                highTrait: "无私的利他主义与持久耐心，默默守护的力量。你不求回报，只为看到他人幸福。",
+                careers: ["护士", "教师", "行政专员", "社工", "客户服务", "人力资源", "营养师"],
+                soulMate: "ESTP",
+                workPartner: "ESFJ",
+                bestFriend: "ISTJ",
+                quote: "在细微之处，我倾注全部的温柔。",
+                cognitive: {Si: 45, Fe: 40, Ti: 25, Ne: 15, Fi: 30, Se: 20, Ni: 10, Te: 15},
+                deepAnalysis: "作为ISFJ，你的主导功能是内向感觉(Si)与外向情感(Fe)的结合，这让你成为一个天生的照顾者。你能够记住每个人的喜好、生日、重要日子，并在适当的时候给予关怀。你的辅助功能外向情感(Fe)让你敏锐地感知群体的情绪氛围。你的第三功能内向思考(Ti)帮助你分析问题，而你的劣势功能外向直觉(Ne)可能让你对未来感到焦虑。",
+                stressResponse: "压力下你可能过度付出，忽视自己的需求，或者突然变得异常悲观。建议：学会说\"不\"，设定个人边界；定期进行自我关怀；不要过度承担他人的问题；寻求他人的支持。",
+                communication: "你的沟通温和、体贴，善于倾听和安慰。你可能避免直接表达不满，有时会压抑真实感受。建议：学会直接但温和地表达需求；不要假设别人应该知道你的感受；在帮助他人前先确保自己的状态良好。",
+                learning: "你适合通过实践学习、服务他人、参与有意义的项目来学习。你需要感到所学能够帮助他人。建议：将学习与实际应用结合；寻找能够服务他人的学习机会；与同学建立互助关系。"
+            },
+            "ISTP": {
+                nickname: "冷静手艺人",
+                monologue: "你拥有冷静的头脑和出色的动手能力，善于分析问题的本质并找到务实的解决方案。你享受当下的体验，是危机中的定海神针。在紧急情况下，你总能保持冷静，迅速找到解决办法。",
+                superPower: "危机处理与技术分析，在压力下保持冷静并快速解决问题。你擅长将理论知识转化为实际操作。",
+                highTrait: "实用主义与适应性，灵活应对变化的能力。你能够快速适应新环境，找到最有效的解决方案。",
+                careers: ["工程师", "飞行员", "法医", "系统分析师", "极限运动员", "机械师", "程序员"],
+                soulMate: "ESFJ",
+                workPartner: "ESTP",
+                bestFriend: "ISFP",
+                quote: "我不说话，但我手中的工具会证明一切。",
+                cognitive: {Ti: 45, Se: 40, Ni: 25, Fe: 15, Te: 20, Si: 30, Ne: 10, Fi: 20},
+                deepAnalysis: "作为ISTP，你的主导功能是内向思考(Ti)与外向感觉(Se)的结合，这让你成为一个天生的实践者。你喜欢亲自动手解决问题，通过实际操作来理解事物。你擅长在压力下保持冷静，迅速分析情况并采取行动。你的第三功能内向直觉(Ni)偶尔会给你一些直觉性的洞察，而你的劣势功能外向情感(Fe)可能让你在处理人际关系时感到困难。",
+                stressResponse: "压力下你可能变得冷漠疏离，过度追求刺激，或者突然情绪爆发。建议：学会识别和表达情感；给自己独处的时间来恢复能量；通过运动或手工活动来释放压力；与信任的人建立深层次的连接。",
+                communication: "你的沟通简洁、直接、注重实际。你可能不擅长闲聊，有时会显得过于冷淡。建议：在沟通时多关注对方的情感需求；学会用语言表达欣赏和关心；给对方更多的反馈。",
+                learning: "你适合通过动手实践、解决实际问题、探索感兴趣的领域来学习。你需要看到知识的实际应用。建议：选择能够动手操作的学习方式；通过拆解和重组来理解原理；寻找实际项目来应用所学。"
+            },
+            "ISFP": {
+                nickname: "自由艺术家",
+                monologue: "你拥有敏锐的审美和强烈的个人价值观，追求自由与真实。你通过行动而非言语表达自己，活在当下，享受生命的每一刻。你的美不在于张扬，而在于那份独特的真实和纯粹。",
+                superPower: "审美感知与实务创作，将美感融入现实的能力。你拥有独特的艺术眼光和创作天赋。",
+                highTrait: "忠于自我的勇气，在平凡中发现美的眼睛。你不会为了迎合他人而改变自己。",
+                careers: ["设计师", "音乐家", "厨师", "摄影师", "兽医", "园艺师", "艺术家"],
+                soulMate: "ESTJ",
+                workPartner: "ESFP",
+                bestFriend: "ISTP",
+                quote: "我不需要被理解，我只需要真实地存在。",
+                cognitive: {Fi: 45, Se: 40, Ni: 25, Te: 15, Ti: 30, Si: 20, Ne: 10, Fe: 20},
+                deepAnalysis: "作为ISFP，你的主导功能是内向情感(Fi)与外向感觉(Se)的结合，这让你成为一个天生的艺术家。你活在当下，敏锐地感知周围的环境和人的情绪。你的价值观深深植根于内心，你会用行动而非言语来表达自己。你的第三功能内向直觉(Ni)偶尔会给你一些深刻的洞察，而你的劣势功能外向思考(Te)可能让你在需要果断决策时感到困难。",
+                stressResponse: "压力下你可能变得自我封闭，过度敏感，或者突然做出冲动的决定。建议：学会用语言表达情感和需求；给自己创造的空间和时间；通过艺术创作来处理压力；与理解你的人分享内心。",
+                communication: "你的沟通温和、真诚，更多通过行动而非言语表达。你可能在表达不同意见时感到困难。建议：学会直接但温和地表达想法；不要假设别人能够理解你的沉默；在重要问题上给自己时间整理思绪。",
+                learning: "你适合通过实践体验、艺术创作、探索感兴趣的领域来学习。你需要感到学习是自我表达的一部分。建议：选择能够发挥创造力的学习方式；通过实际项目来学习；追随内心的兴趣。"
+            },
+            "ENTP": {
+                nickname: "创新辩论家",
+                monologue: "你充满好奇心和创造力，热爱智力挑战和辩论。你善于看到可能性，喜欢打破常规，是点燃团队思维的火花。对你来说，没有什么是不可能的，只有还没想到的方法。",
+                superPower: "创新思维与战略辩论，能够发现非常规解决方案。你擅长从多角度看待问题，找到别人忽略的机会。",
+                highTrait: "智力敏捷与适应性，在变化中寻找机会的眼光。你能够快速适应新环境，并将其转化为优势。",
+                careers: ["创业者", "战略顾问", "律师", "发明家", "媒体人", "产品经理", "咨询师"],
+                soulMate: "INFJ",
+                workPartner: "INTJ",
+                bestFriend: "ENFP",
+                quote: "规则就是用来打破的，可能性才是我的信仰。",
+                cognitive: {Ne: 45, Ti: 40, Fe: 25, Si: 15, Te: 30, Ni: 20, Se: 10, Fi: 15},
+                deepAnalysis: "作为ENTP，你的主导功能是外向直觉(Ne)与内向思考(Ti)的结合，这让你成为一个天生的创新者。你能够迅速看到各种可能性，并用逻辑来分析每种可能性的可行性。你热爱智力挑战，喜欢通过辩论来完善自己的想法。你的第三功能外向情感(Fe)让你能够理解他人，而你的劣势功能内向感觉(Si)可能让你忽视细节和过去的经验。",
+                stressResponse: "压力下你可能变得过度争论，忽视他人的感受，或者突然变得异常固执。建议：学会在适当的时候停止辩论；关注执行细节；尊重他人的情感需求；给自己时间独处来整理思绪。",
+                communication: "你的沟通机智、幽默、充满创意。你可能过于直接，有时会无意中伤害他人。建议：在提出不同意见前先肯定对方的观点；学会倾听而不总是反驳；注意对方的情感反应。",
+                learning: "你适合通过探索多种可能性、参与辩论、解决复杂问题来学习。你需要感到学习是充满挑战和乐趣的。建议：选择能够激发好奇心的学习主题；与他人讨论来完善理解；将所学应用于创新项目中。"
+            },
+            "ENFP": {
+                nickname: "热情倡导者",
+                monologue: "你充满热情和创意，善于激励他人，追求有意义的人际关系。你拥有无限的可能性，是生活中的催化剂和灵感源泉。你的热情具有感染力，能够点燃周围人的激情。",
+                superPower: "人际连接与创意激发，能够点燃他人的热情。你擅长发现每个人的潜力并帮助他们实现。",
+                highTrait: "乐观主义与同理心，看到每个人最好一面的能力。你相信每个人都有无限的可能性。",
+                careers: ["市场营销", "培训师", "记者", "演员", "创业者", "人力资源", "公关"],
+                soulMate: "INTJ",
+                workPartner: "ENTJ",
+                bestFriend: "INFP",
+                quote: "世界充满可能性，而我就是那个打开大门的人。",
+                cognitive: {Ne: 45, Fi: 40, Te: 25, Si: 15, Ti: 30, Fe: 20, Ni: 10, Se: 15},
+                deepAnalysis: "作为ENFP，你的主导功能是外向直觉(Ne)与内向情感(Fi)的结合，这让你成为一个天生的激励者。你能够迅速看到各种可能性，并真诚地关心每个人的成长。你追求有意义的人际关系和项目，需要感到自己的工作有价值。你的第三功能外向思考(Te)帮助你组织和执行想法，而你的劣势功能内向感觉(Si)可能让你忽视细节和日常事务。",
+                stressResponse: "压力下你可能变得过度分散，难以专注，或者突然变得异常自我批评。建议：学会设定优先级，专注于最重要的任务；建立日常的规律和习惯；给自己独处的时间来恢复能量；接受不完美。",
+                communication: "你的沟通热情、真诚、富有感染力。你可能过于表达，有时会忽略倾听。建议：学会在适当的时候倾听；注意对方的反应，调整自己的表达方式；在重要对话前先整理思绪。",
+                learning: "你适合通过探索感兴趣的领域、与人交流、参与有意义的项目来学习。你需要感到学习是充满乐趣和意义的。建议：选择能够激发热情的学习主题；与他人组成学习小组；将所学应用于帮助他人的实践中。"
+            },
+            "ENTJ": {
+                nickname: "魅力指挥官",
+                monologue: "你天生具有领导力和战略眼光，善于组织资源实现目标。你果断、高效，追求卓越，是天生的组织者和决策者。你不会等待机会，而是主动创造机会并征服它。",
+                superPower: "战略规划与组织领导力，将愿景转化为大规模行动。你擅长激励团队，带领大家一起实现目标。",
+                highTrait: "果断决策与高效执行，带领团队征服高峰的能力。你拥有将愿景变为现实的决心和能力。",
+                careers: ["CEO", "管理顾问", "律师", "政治家", "投资人", "企业家", "军事指挥官"],
+                soulMate: "INFP",
+                workPartner: "INTP",
+                bestFriend: "ENFJ",
+                quote: "我不等待机会，我创造机会并征服它。",
+                cognitive: {Te: 45, Ni: 40, Se: 25, Fi: 15, Ti: 30, Ne: 20, Si: 10, Fe: 15},
+                deepAnalysis: "作为ENTJ，你的主导功能是外向思考(Te)与内向直觉(Ni)的结合，这让你成为一个天生的领导者。你能够迅速分析情况，制定战略，并高效地组织资源来实现目标。你追求卓越，对自己和他人都有很高的标准。你的第三功能外向感觉(Se)让你能够关注当下的实际情况，而你的劣势功能内向情感(Fi)可能让你在处理个人情感时感到困难。",
+                stressResponse: "压力下你可能变得过度控制，对他人要求过高，或者突然变得异常情绪化。建议：学会授权和信任他人；接受不完美；关注他人的情感需求；给自己时间独处来反思。",
+                communication: "你的沟通直接、高效、有说服力。你可能过于直接，有时会忽略他人的感受。建议：在提出批评前先肯定对方的努力；学会用更温和的方式表达不同意见；倾听他人的想法和感受。",
+                learning: "你适合通过设定明确目标、制定学习计划、领导项目来学习。你需要看到学习与实际成果的关联。建议：为学习设定可量化的目标；寻找能够挑战你的学习材料；将所学应用于实际项目中。"
+            },
+            "ENFJ": {
+                nickname: "主人公",
+                monologue: "你拥有非凡的魅力和同理心，善于激励和引导他人成长。你关注群体和谐，是天生的教育者和领导者，追求共同的价值实现。你相信每个人都有成为更好的自己的潜力。",
+                superPower: "群体激励与关系协调，能够凝聚团队实现共同目标。你擅长发现每个人的优点并帮助他们发光。",
+                highTrait: "利他主义与影响力，帮助他人实现潜能的满足感。你最大的快乐来自看到他人成长和成功。",
+                careers: ["人力资源总监", "销售总监", "教师", "政治家", "教练", "培训师", "咨询师"],
+                soulMate: "INTP",
+                workPartner: "ENTP",
+                bestFriend: "INFJ",
+                quote: "我不是主角，我是让每个人都成为主角的导演。",
+                cognitive: {Fe: 45, Ni: 40, Se: 25, Ti: 15, Fi: 30, Ne: 20, Si: 10, Te: 15},
+                deepAnalysis: "作为ENFJ，你的主导功能是外向情感(Fe)与内向直觉(Ni)的结合，这让你成为一个天生的导师。你能够敏锐地感知群体的情绪氛围，并引导大家朝着共同的目标前进。你真诚地关心每个人的成长，愿意付出时间和精力来帮助他们。你的第三功能外向感觉(Se)让你能够关注当下的实际情况，而你的劣势功能内向思考(Ti)可能让你在需要客观分析时感到困难。",
+                stressResponse: "压力下你可能过度付出，忽视自己的需求，或者突然变得异常挑剔。建议：学会设定个人边界，不要过度承担他人的问题；定期进行自我关怀；接受自己无法帮助所有人；寻求他人的支持。",
+                communication: "你的沟通热情、富有感染力，善于倾听和激励。你可能过于关注他人的反应，有时会压抑真实想法。建议：学会在保持和谐的同时表达不同意见；不要过度承担他人的情绪；给自己时间独处来恢复能量。",
+                learning: "你适合通过与人交流、参与有意义的项目、帮助他人来学习。你需要感到学习能够帮助他人成长。建议：选择能够服务他人的学习主题；与他人组成学习小组；将所学应用于实践中。"
+            },
+            "ESTP": {
+                nickname: "活力实干家",
+                monologue: "你活在当下，享受刺激和行动。你务实、灵活，善于抓住机会，是危机中的行动派和团队中的能量源。你相信想太多不如做一步，行动就是最好的答案。",
+                superPower: "即时反应与实务操作，在动态环境中快速决策。你擅长在混乱中找到机会，迅速采取行动。",
+                highTrait: "适应性与勇气，敢于冒险并享受过程的态度。你不怕失败，因为每一次尝试都是学习的机会。",
+                careers: ["销售", "急救人员", "运动员", "创业者", "侦探", "交易员", "演员"],
+                soulMate: "ISFJ",
+                workPartner: "ISTP",
+                bestFriend: "ESFP",
+                quote: "想太多不如做一步，行动就是我的语言。",
+                cognitive: {Se: 45, Ti: 40, Fe: 25, Ni: 15, Te: 20, Si: 30, Ne: 10, Fi: 15},
+                deepAnalysis: "作为ESTP，你的主导功能是外向感觉(Se)与内向思考(Ti)的结合，这让你成为一个天生的行动者。你活在当下，敏锐地感知周围的环境，并迅速做出反应。你喜欢刺激和挑战，擅长在危机中保持冷静并找到解决方案。你的第三功能外向情感(Fe)让你能够理解他人，而你的劣势功能内向直觉(Ni)可能让你忽视长远的影响。",
+                stressResponse: "压力下你可能变得冲动鲁莽，过度追求刺激，或者突然变得异常悲观。建议：学会在行动前思考可能的后果；给自己时间独处来反思；通过运动来释放多余的能量；建立长期的规划和目标。",
+                communication: "你的沟通直接、幽默、充满活力。你可能过于直接，有时会忽略他人的感受。建议：在沟通时多关注对方的情感需求；学会倾听而不总是打断；在重要对话前先整理思绪。",
+                learning: "你适合通过实践体验、解决实际问题、探索感兴趣的领域来学习。你需要感到学习是充满刺激和乐趣的。建议：选择能够动手操作的学习方式；通过实际项目来学习；将所学应用于解决实际问题。"
+            },
+            "ESFP": {
+                nickname: "表演艺术家",
+                monologue: "你热情、友好，享受生活中的每一刻。你善于营造欢乐氛围，是聚会的灵魂人物，用热情和真诚感染周围的人。你相信快乐是一种选择，也是一种可以传递的礼物。",
+                superPower: "现场氛围营造与人际连接，让每个人都感到被重视。你擅长让平凡的时刻变得特别。",
+                highTrait: "生活热情与审美品味，享受当下的艺术。你能够在日常生活中发现美和快乐。",
+                careers: ["演员", "公关专员", "活动策划", "导游", "设计师", "销售", "主持人"],
+                soulMate: "ISTJ",
+                workPartner: "ISFP",
+                bestFriend: "ESTP",
+                quote: "人生是舞台，而我总是全情投入的表演者。",
+                cognitive: {Se: 45, Fi: 40, Te: 25, Ni: 15, Ti: 20, Si: 30, Ne: 10, Fe: 20},
+                deepAnalysis: "作为ESFP，你的主导功能是外向感觉(Se)与内向情感(Fi)的结合，这让你成为一个天生的表演者。你活在当下，敏锐地感知周围的环境和人的情绪。你追求快乐和美好，善于营造欢乐的氛围。你的第三功能外向思考(Te)帮助你组织和执行想法，而你的劣势功能内向直觉(Ni)可能让你忽视长远的影响和深层的模式。",
+                stressResponse: "压力下你可能变得过度追求刺激，忽视责任，或者突然变得异常自我批评。建议：学会面对和处理负面情绪；建立日常的规律和习惯；给自己独处的时间来反思；接受生活不总是快乐的。",
+                communication: "你的沟通热情、真诚、富有感染力。你可能过于表达，有时会忽略倾听。建议：学会在适当的时候倾听；注意对方的反应，调整自己的表达方式；在重要对话前先整理思绪。",
+                learning: "你适合通过实践体验、与人交流、参与有趣的活动来学习。你需要感到学习是充满乐趣的。建议：选择能够激发兴趣的学习方式；与他人组成学习小组；将所学应用于创造美好的体验。"
+            },
+            "ESTJ": {
+                nickname: "总经理",
+                monologue: "你重视秩序、效率和传统，善于组织和管理。你务实、果断，是维护规则和稳定的中坚力量，值得信赖的守护者。你相信效率即美德，结果证明一切。",
+                superPower: "组织管理与流程优化，确保系统高效运转。你擅长建立和维护高效的系统和流程。",
+                highTrait: "责任感与执行力，维护秩序和标准的坚定。你是团队中可以依赖的基石。",
+                careers: ["项目经理", "军官", "法官", "行政总监", "财务总监", "运营经理", "警察"],
+                soulMate: "ISFP",
+                workPartner: "ISTJ",
+                bestFriend: "ESFJ",
+                quote: "效率即美德，结果证明一切。",
+                cognitive: {Te: 45, Si: 40, Ne: 25, Fi: 15, Ti: 30, Se: 20, Ni: 10, Fe: 15},
+                deepAnalysis: "作为ESTJ，你的主导功能是外向思考(Te)与内向感觉(Si)的结合，这让你成为一个天生的管理者。你重视经验、传统和已验证的方法，相信遵循规则能够带来效率和稳定。你务实、果断，善于组织和执行。你的第三功能外向直觉(Ne)偶尔会给你一些新的想法，而你的劣势功能内向情感(Fi)可能让你在处理个人情感时感到困难。",
+                stressResponse: "压力下你可能变得过度固执，拒绝任何改变，或者突然变得异常情绪化。建议：学会接受适度的变化和创新；关注他人的情感需求；给自己时间独处来反思；接受不完美。",
+                communication: "你的沟通直接、高效、注重事实。你可能过于直接，有时会忽略他人的感受。建议：在提出批评前先肯定对方的努力；学会用更温和的方式表达不同意见；倾听他人的想法和感受。",
+                learning: "你适合通过系统学习、实践操作、循序渐进的方式来学习。你需要清晰的结构和明确的目标。建议：制定详细的学习计划；通过反复练习来巩固知识；将新知识与已有经验联系起来。"
+            },
+            "ESFJ": {
+                nickname: "供给者",
+                monologue: "你热心、负责，关注他人的需求和社会的和谐。你善于照顾他人，是群体中的粘合剂，用温暖和关怀维系着关系网络。你的笑容是最好的礼物，你的关怀是最温暖的阳光。",
+                superPower: "关系维护与社群建设，创造归属感的能力。你擅长让每个人都感到被接纳和珍视。",
+                highTrait: "利他主义与社交智慧，让每个人都感到被接纳。你是群体中的温暖港湾。",
+                careers: ["人力资源", "客户服务", "护士", "教师", "社区管理", "社工", "行政"],
+                soulMate: "ISTP",
+                workPartner: "ISFJ",
+                bestFriend: "ESTJ",
+                quote: "你的笑容，就是我最好的回报。",
+                cognitive: {Fe: 45, Si: 40, Ne: 25, Ti: 15, Fi: 30, Se: 20, Ni: 10, Te: 15},
+                deepAnalysis: "作为ESFJ，你的主导功能是外向情感(Fe)与内向感觉(Si)的结合，这让你成为一个天生的照顾者。你敏锐地感知群体的情绪氛围，重视传统和和谐，善于维护社会关系。你愿意付出时间和精力来确保每个人的需求都得到满足。你的第三功能外向直觉(Ne)偶尔会给你一些新的想法，而你的劣势功能内向思考(Ti)可能让你在需要客观分析时感到困难。",
+                stressResponse: "压力下你可能过度付出，忽视自己的需求，或者突然变得异常挑剔。建议：学会说\"不\"，设定个人边界；定期进行自我关怀；不要过度承担他人的问题；接受自己无法让所有人都满意。",
+                communication: "你的沟通温暖、体贴，善于倾听。你可能过于关注他人的反应，有时会压抑真实想法。建议：学会在保持和谐的同时表达不同意见；不要过度承担他人的情绪；给自己时间独处来恢复能量。",
+                learning: "你适合通过与人交流、参与有意义的项目、服务他人来学习。你需要感到学习能够帮助他人。建议：选择能够服务他人的学习主题；与他人组成学习小组；将所学应用于实践中。"
+            }
+        };
+
+        // ==================== 新等级系统：60-600分 ====================
+        // 6个等级，分数分布均匀，确保有最低分和最高分
+        const stageConfig = [
+            {min: 60, max: 149, name: "青铜", stage: "未进阶", level: "入门", color: "#8B4513", badge: "💫 沉睡者", star: 1},
+            {min: 150, max: 249, name: "白银", stage: "初阶", level: "入门", color: "#C0C0C0", badge: "🌱 萌芽者", star: 2},
+            {min: 250, max: 349, name: "黄金", stage: "初阶", level: "进阶", color: "#FFD700", badge: "🔥 探索者", star: 3},
+            {min: 350, max: 449, name: "钻石", stage: "中阶", level: "进阶", color: "#B9F2FF", badge: "💎 洞察者", star: 4},
+            {min: 450, max: 529, name: "王者", stage: "中阶", level: "高阶", color: "#9B59B6", badge: "👑 掌控者", star: 5},
+            {min: 530, max: 600, name: "传奇", stage: "高阶", level: "宗师", color: "#FF6B6B", badge: "🌌 传奇", star: 6}
+        ];
+
+        // 96种结果配置 (16类型 × 6等级)
+        const resultVariants = {
+            "INTP": {
+                bronze: { title: "逻辑萌芽", subtitle: "沉睡的思考者", radarMod: {Ti: 0.6, Ne: 0.5, Si: 0.3, Fe: 0.2} },
+                silver: { title: "逻辑学徒", subtitle: "觉醒的分析者", radarMod: {Ti: 0.75, Ne: 0.65, Si: 0.4, Fe: 0.3} },
+                gold: { title: "逻辑探索者", subtitle: "成长的构建者", radarMod: {Ti: 0.85, Ne: 0.75, Si: 0.5, Fe: 0.35} },
+                diamond: { title: "逻辑洞察者", subtitle: "成熟的思考者", radarMod: {Ti: 0.92, Ne: 0.85, Si: 0.6, Fe: 0.45} },
+                king: { title: "逻辑掌控者", subtitle: "卓越的大师", radarMod: {Ti: 0.97, Ne: 0.92, Si: 0.7, Fe: 0.55} },
+                legend: { title: "逻辑传奇", subtitle: "真理的化身", radarMod: {Ti: 1.0, Ne: 0.98, Si: 0.8, Fe: 0.65} }
+            },
+            "INTJ": {
+                bronze: { title: "战略萌芽", subtitle: "沉睡的远见者", radarMod: {Ni: 0.6, Te: 0.5, Fi: 0.3, Se: 0.2} },
+                silver: { title: "战略学徒", subtitle: "觉醒的规划者", radarMod: {Ni: 0.75, Te: 0.65, Fi: 0.4, Se: 0.3} },
+                gold: { title: "战略探索者", subtitle: "成长的战略家", radarMod: {Ni: 0.85, Te: 0.75, Fi: 0.5, Se: 0.35} },
+                diamond: { title: "战略洞察者", subtitle: "成熟的远见者", radarMod: {Ni: 0.92, Te: 0.85, Fi: 0.6, Se: 0.45} },
+                king: { title: "战略掌控者", subtitle: "卓越的大师", radarMod: {Ni: 0.97, Te: 0.92, Fi: 0.7, Se: 0.55} },
+                legend: { title: "战略传奇", subtitle: "未来的塑造者", radarMod: {Ni: 1.0, Te: 0.98, Fi: 0.8, Se: 0.65} }
+            },
+            "INFJ": {
+                bronze: { title: "灵魂萌芽", subtitle: "沉睡的引路人", radarMod: {Ni: 0.6, Fe: 0.5, Ti: 0.3, Se: 0.2} },
+                silver: { title: "灵魂学徒", subtitle: "觉醒的共情者", radarMod: {Ni: 0.75, Fe: 0.65, Ti: 0.4, Se: 0.3} },
+                gold: { title: "灵魂探索者", subtitle: "成长的治愈者", radarMod: {Ni: 0.85, Fe: 0.75, Ti: 0.5, Se: 0.35} },
+                diamond: { title: "灵魂洞察者", subtitle: "成熟的引路人", radarMod: {Ni: 0.92, Fe: 0.85, Ti: 0.6, Se: 0.45} },
+                king: { title: "灵魂掌控者", subtitle: "卓越的大师", radarMod: {Ni: 0.97, Fe: 0.92, Ti: 0.7, Se: 0.55} },
+                legend: { title: "灵魂传奇", subtitle: "光明的使者", radarMod: {Ni: 1.0, Fe: 0.98, Ti: 0.8, Se: 0.65} }
+            },
+            "INFP": {
+                bronze: { title: "理想萌芽", subtitle: "沉睡的梦想家", radarMod: {Fi: 0.6, Ne: 0.5, Si: 0.3, Te: 0.2} },
+                silver: { title: "理想学徒", subtitle: "觉醒的诗人", radarMod: {Fi: 0.75, Ne: 0.65, Si: 0.4, Te: 0.3} },
+                gold: { title: "理想探索者", subtitle: "成长的艺术家", radarMod: {Fi: 0.85, Ne: 0.75, Si: 0.5, Te: 0.35} },
+                diamond: { title: "理想洞察者", subtitle: "成熟的梦想家", radarMod: {Fi: 0.92, Ne: 0.85, Si: 0.6, Te: 0.45} },
+                king: { title: "理想掌控者", subtitle: "卓越的大师", radarMod: {Fi: 0.97, Ne: 0.92, Si: 0.7, Te: 0.55} },
+                legend: { title: "理想传奇", subtitle: "纯粹的化身", radarMod: {Fi: 1.0, Ne: 0.98, Si: 0.8, Te: 0.65} }
+            },
+            "ISTJ": {
+                bronze: { title: "守护萌芽", subtitle: "沉睡的基石", radarMod: {Si: 0.6, Te: 0.5, Fi: 0.3, Ne: 0.2} },
+                silver: { title: "守护学徒", subtitle: "觉醒的执行者", radarMod: {Si: 0.75, Te: 0.65, Fi: 0.4, Ne: 0.3} },
+                gold: { title: "守护探索者", subtitle: "成长的守护者", radarMod: {Si: 0.85, Te: 0.75, Fi: 0.5, Ne: 0.35} },
+                diamond: { title: "守护洞察者", subtitle: "成熟的基石", radarMod: {Si: 0.92, Te: 0.85, Fi: 0.6, Ne: 0.45} },
+                king: { title: "守护掌控者", subtitle: "卓越的大师", radarMod: {Si: 0.97, Te: 0.92, Fi: 0.7, Ne: 0.55} },
+                legend: { title: "守护传奇", subtitle: "永恒的支柱", radarMod: {Si: 1.0, Te: 0.98, Fi: 0.8, Ne: 0.65} }
+            },
+            "ISFJ": {
+                bronze: { title: "温暖萌芽", subtitle: "沉睡的港湾", radarMod: {Si: 0.6, Fe: 0.5, Ti: 0.3, Ne: 0.2} },
+                silver: { title: "温暖学徒", subtitle: "觉醒的照顾者", radarMod: {Si: 0.75, Fe: 0.65, Ti: 0.4, Ne: 0.3} },
+                gold: { title: "温暖探索者", subtitle: "成长的守护者", radarMod: {Si: 0.85, Fe: 0.75, Ti: 0.5, Ne: 0.35} },
+                diamond: { title: "温暖洞察者", subtitle: "成熟的港湾", radarMod: {Si: 0.92, Fe: 0.85, Ti: 0.6, Ne: 0.45} },
+                king: { title: "温暖掌控者", subtitle: "卓越的大师", radarMod: {Si: 0.97, Fe: 0.92, Ti: 0.7, Ne: 0.55} },
+                legend: { title: "温暖传奇", subtitle: "爱的化身", radarMod: {Si: 1.0, Fe: 0.98, Ti: 0.8, Ne: 0.65} }
+            },
+            "ISTP": {
+                bronze: { title: "工匠萌芽", subtitle: "沉睡的匠人", radarMod: {Ti: 0.6, Se: 0.5, Ni: 0.3, Fe: 0.2} },
+                silver: { title: "工匠学徒", subtitle: "觉醒的手艺人", radarMod: {Ti: 0.75, Se: 0.65, Ni: 0.4, Fe: 0.3} },
+                gold: { title: "工匠探索者", subtitle: "成长的实践者", radarMod: {Ti: 0.85, Se: 0.75, Ni: 0.5, Fe: 0.35} },
+                diamond: { title: "工匠洞察者", subtitle: "成熟的匠人", radarMod: {Ti: 0.92, Se: 0.85, Ni: 0.6, Fe: 0.45} },
+                king: { title: "工匠掌控者", subtitle: "卓越的大师", radarMod: {Ti: 0.97, Se: 0.92, Ni: 0.7, Fe: 0.55} },
+                legend: { title: "工匠传奇", subtitle: "技艺的巅峰", radarMod: {Ti: 1.0, Se: 0.98, Ni: 0.8, Fe: 0.65} }
+            },
+            "ISFP": {
+                bronze: { title: "艺术萌芽", subtitle: "沉睡的创作者", radarMod: {Fi: 0.6, Se: 0.5, Ni: 0.3, Te: 0.2} },
+                silver: { title: "艺术学徒", subtitle: "觉醒的艺术家", radarMod: {Fi: 0.75, Se: 0.65, Ni: 0.4, Te: 0.3} },
+                gold: { title: "艺术探索者", subtitle: "成长的创作者", radarMod: {Fi: 0.85, Se: 0.75, Ni: 0.5, Te: 0.35} },
+                diamond: { title: "艺术洞察者", subtitle: "成熟的艺术家", radarMod: {Fi: 0.92, Se: 0.85, Ni: 0.6, Te: 0.45} },
+                king: { title: "艺术掌控者", subtitle: "卓越的大师", radarMod: {Fi: 0.97, Se: 0.92, Ni: 0.7, Te: 0.55} },
+                legend: { title: "艺术传奇", subtitle: "美的化身", radarMod: {Fi: 1.0, Se: 0.98, Ni: 0.8, Te: 0.65} }
+            },
+            "ENTP": {
+                bronze: { title: "创新萌芽", subtitle: "沉睡的火花", radarMod: {Ne: 0.6, Ti: 0.5, Fe: 0.3, Si: 0.2} },
+                silver: { title: "创新学徒", subtitle: "觉醒的辩论家", radarMod: {Ne: 0.75, Ti: 0.65, Fe: 0.4, Si: 0.3} },
+                gold: { title: "创新探索者", subtitle: "成长的创新者", radarMod: {Ne: 0.85, Ti: 0.75, Fe: 0.5, Si: 0.35} },
+                diamond: { title: "创新洞察者", subtitle: "成熟的火花", radarMod: {Ne: 0.92, Ti: 0.85, Fe: 0.6, Si: 0.45} },
+                king: { title: "创新掌控者", subtitle: "卓越的大师", radarMod: {Ne: 0.97, Ti: 0.92, Fe: 0.7, Si: 0.55} },
+                legend: { title: "创新传奇", subtitle: "变革的先锋", radarMod: {Ne: 1.0, Ti: 0.98, Fe: 0.8, Si: 0.65} }
+            },
+            "ENFP": {
+                bronze: { title: "热情萌芽", subtitle: "沉睡的火焰", radarMod: {Ne: 0.6, Fi: 0.5, Te: 0.3, Si: 0.2} },
+                silver: { title: "热情学徒", subtitle: "觉醒的倡导者", radarMod: {Ne: 0.75, Fi: 0.65, Te: 0.4, Si: 0.3} },
+                gold: { title: "热情探索者", subtitle: "成长的激励者", radarMod: {Ne: 0.85, Fi: 0.75, Te: 0.5, Si: 0.35} },
+                diamond: { title: "热情洞察者", subtitle: "成熟的火焰", radarMod: {Ne: 0.92, Fi: 0.85, Te: 0.6, Si: 0.45} },
+                king: { title: "热情掌控者", subtitle: "卓越的大师", radarMod: {Ne: 0.97, Fi: 0.92, Te: 0.7, Si: 0.55} },
+                legend: { title: "热情传奇", subtitle: "希望的化身", radarMod: {Ne: 1.0, Fi: 0.98, Te: 0.8, Si: 0.65} }
+            },
+            "ENTJ": {
+                bronze: { title: "领袖萌芽", subtitle: "沉睡的统帅", radarMod: {Te: 0.6, Ni: 0.5, Se: 0.3, Fi: 0.2} },
+                silver: { title: "领袖学徒", subtitle: "觉醒的指挥官", radarMod: {Te: 0.75, Ni: 0.65, Se: 0.4, Fi: 0.3} },
+                gold: { title: "领袖探索者", subtitle: "成长的领导者", radarMod: {Te: 0.85, Ni: 0.75, Se: 0.5, Fi: 0.35} },
+                diamond: { title: "领袖洞察者", subtitle: "成熟的统帅", radarMod: {Te: 0.92, Ni: 0.85, Se: 0.6, Fi: 0.45} },
+                king: { title: "领袖掌控者", subtitle: "卓越的大师", radarMod: {Te: 0.97, Ni: 0.92, Se: 0.7, Fi: 0.55} },
+                legend: { title: "领袖传奇", subtitle: "征服的象征", radarMod: {Te: 1.0, Ni: 0.98, Se: 0.8, Fi: 0.65} }
+            },
+            "ENFJ": {
+                bronze: { title: "主角萌芽", subtitle: "沉睡的导师", radarMod: {Fe: 0.6, Ni: 0.5, Se: 0.3, Ti: 0.2} },
+                silver: { title: "主角学徒", subtitle: "觉醒的主人公", radarMod: {Fe: 0.75, Ni: 0.65, Se: 0.4, Ti: 0.3} },
+                gold: { title: "主角探索者", subtitle: "成长的导师", radarMod: {Fe: 0.85, Ni: 0.75, Se: 0.5, Ti: 0.35} },
+                diamond: { title: "主角洞察者", subtitle: "成熟的导师", radarMod: {Fe: 0.92, Ni: 0.85, Se: 0.6, Ti: 0.45} },
+                king: { title: "主角掌控者", subtitle: "卓越的大师", radarMod: {Fe: 0.97, Ni: 0.92, Se: 0.7, Ti: 0.55} },
+                legend: { title: "主角传奇", subtitle: "光明的引领者", radarMod: {Fe: 1.0, Ni: 0.98, Se: 0.8, Ti: 0.65} }
+            },
+            "ESTP": {
+                bronze: { title: "行动萌芽", subtitle: "沉睡的冒险家", radarMod: {Se: 0.6, Ti: 0.5, Fe: 0.3, Ni: 0.2} },
+                silver: { title: "行动学徒", subtitle: "觉醒的实干家", radarMod: {Se: 0.75, Ti: 0.65, Fe: 0.4, Ni: 0.3} },
+                gold: { title: "行动探索者", subtitle: "成长的冒险者", radarMod: {Se: 0.85, Ti: 0.75, Fe: 0.5, Ni: 0.35} },
+                diamond: { title: "行动洞察者", subtitle: "成熟的冒险家", radarMod: {Se: 0.92, Ti: 0.85, Fe: 0.6, Ni: 0.45} },
+                king: { title: "行动掌控者", subtitle: "卓越的大师", radarMod: {Se: 0.97, Ti: 0.92, Fe: 0.7, Ni: 0.55} },
+                legend: { title: "行动传奇", subtitle: "自由的化身", radarMod: {Se: 1.0, Ti: 0.98, Fe: 0.8, Ni: 0.65} }
+            },
+            "ESFP": {
+                bronze: { title: "表演萌芽", subtitle: "沉睡的明星", radarMod: {Se: 0.6, Fi: 0.5, Te: 0.3, Ni: 0.2} },
+                silver: { title: "表演学徒", subtitle: "觉醒的表演者", radarMod: {Se: 0.75, Fi: 0.65, Te: 0.4, Ni: 0.3} },
+                gold: { title: "表演探索者", subtitle: "成长的艺人", radarMod: {Se: 0.85, Fi: 0.75, Te: 0.5, Ni: 0.35} },
+                diamond: { title: "表演洞察者", subtitle: "成熟的明星", radarMod: {Se: 0.92, Fi: 0.85, Te: 0.6, Ni: 0.45} },
+                king: { title: "表演掌控者", subtitle: "卓越的大师", radarMod: {Se: 0.97, Fi: 0.92, Te: 0.7, Ni: 0.55} },
+                legend: { title: "表演传奇", subtitle: "快乐的化身", radarMod: {Se: 1.0, Fi: 0.98, Te: 0.8, Ni: 0.65} }
+            },
+            "ESTJ": {
+                bronze: { title: "管理萌芽", subtitle: "沉睡的管理者", radarMod: {Te: 0.6, Si: 0.5, Ne: 0.3, Fi: 0.2} },
+                silver: { title: "管理学徒", subtitle: "觉醒的总经理", radarMod: {Te: 0.75, Si: 0.65, Ne: 0.4, Fi: 0.3} },
+                gold: { title: "管理探索者", subtitle: "成长的管理者", radarMod: {Te: 0.85, Si: 0.75, Ne: 0.5, Fi: 0.35} },
+                diamond: { title: "管理洞察者", subtitle: "成熟的管理者", radarMod: {Te: 0.92, Si: 0.85, Ne: 0.6, Fi: 0.45} },
+                king: { title: "管理掌控者", subtitle: "卓越的大师", radarMod: {Te: 0.97, Si: 0.92, Ne: 0.7, Fi: 0.55} },
+                legend: { title: "管理传奇", subtitle: "秩序的化身", radarMod: {Te: 1.0, Si: 0.98, Ne: 0.8, Fi: 0.65} }
+            },
+            "ESFJ": {
+                bronze: { title: "供给萌芽", subtitle: "沉睡的供给者", radarMod: {Fe: 0.6, Si: 0.5, Ne: 0.3, Ti: 0.2} },
+                silver: { title: "供给学徒", subtitle: "觉醒的供给者", radarMod: {Fe: 0.75, Si: 0.65, Ne: 0.4, Ti: 0.3} },
+                gold: { title: "供给探索者", subtitle: "成长的供给者", radarMod: {Fe: 0.85, Si: 0.75, Ne: 0.5, Ti: 0.35} },
+                diamond: { title: "供给洞察者", subtitle: "成熟的供给者", radarMod: {Fe: 0.92, Si: 0.85, Ne: 0.6, Ti: 0.45} },
+                king: { title: "供给掌控者", subtitle: "卓越的大师", radarMod: {Fe: 0.97, Si: 0.92, Ne: 0.7, Ti: 0.55} },
+                legend: { title: "供给传奇", subtitle: "关怀的化身", radarMod: {Fe: 1.0, Si: 0.98, Ne: 0.8, Ti: 0.65} }
+            }
+        };
+
+        const quotes = {
+            "INTP": ["在逻辑的迷宫中，我寻找着真理的灯塔。", "知识不是力量，理解才是。", "我思故我在，我疑故我进。"],
+            "INTJ": ["我看见未来的轮廓，并用逻辑将它铸造成现实。", "战略是愿景与执行的桥梁。", "完美不是目标，是方向。"],
+            "INFJ": ["我理解你的沉默，也看见你灵魂的光芒。", "理想主义不是天真，是勇气。", "深度连接胜过广泛社交。"],
+            "INFP": ["在我的内心花园里，每一朵花都有它的名字和故事。", "真实是我唯一的指南针。", "柔软不是弱点，是力量。"],
+            "ISTJ": ["责任不是负担，而是我存在的基石。", "传统是智慧的结晶，秩序是效率的保障。", "说到做到，是我的座右铭。"],
+            "ISFJ": ["在细微之处，我倾注全部的温柔。", "守护比征服更需要勇气。", "记忆是连接过去的桥梁。"],
+            "ISTP": ["我不说话，但我手中的工具会证明一切。", "分析是为了行动，不是为了思考本身。", "危机是展现价值的舞台。"],
+            "ISFP": ["我不需要被理解，我只需要真实地存在。", "美存在于当下的体验中。", "行动胜于言语，作品胜于解释。"],
+            "ENTP": ["规则就是用来打破的，可能性才是我的信仰。", "辩论不是为了赢，是为了真理。", "唯一不变的是变化本身。"],
+            "ENFP": ["世界充满可能性，而我就是那个打开大门的人。", "热情是最具感染力的力量。", "生命的意义在于探索。"],
+            "ENTJ": ["我不等待机会，我创造机会并征服它。", "领导力是责任，不是特权。", "效率即美德，结果证明一切。"],
+            "ENFJ": ["我不是主角，我是让每个人都成为主角的导演。", "理解是改变的开始。", "群体的力量大于个体。"],
+            "ESTP": ["想太多不如做一步，行动就是我的语言。", "风险与回报并存，我选前者。", "活在当下，因为没有彩排。"],
+            "ESFP": ["人生是舞台，而我总是全情投入的表演者。", "快乐是一种选择，也是一种天赋。", "连接让生命有意义。"],
+            "ESTJ": ["效率即美德，结果证明一切。", "秩序是自由的保障。", "传统之所以存在，是因为它有效。"],
+            "ESFJ": ["你的笑容，就是我最好的回报。", "和谐不是没有分歧，而是妥善处理分歧。", "服务他人是最高荣誉。"]
+        };
+
+        // ==================== 状态管理 ====================
+        let currentQuestion = 0;
+        let answers = new Array(60).fill(null);
+        let scores = {
+            E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0,
+            Se: 0, Si: 0, Ne: 0, Ni: 0, Te: 0, Ti: 0, Fe: 0, Fi: 0,
+            rational: 0, acceptance: 0, emotion: 0, social: 0, logic: 0
+        };
+
+        // ==================== 初始化 ====================
+        function init() {
+            setInterval(() => {
+                const base = 1200;
+                const variation = Math.floor(Math.random() * 200);
+                document.getElementById('online-count').textContent = (base + variation).toLocaleString();
+            }, 5000);
+
+            const saved = localStorage.getItem('mindPrismProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.answers && data.answers.some(a => a !== null)) {
+                    if (confirm('检测到未完成的测评，是否继续？')) {
+                        answers = data.answers;
+                        currentQuestion = data.currentQuestion || 0;
+                        startQuiz(true);
+                        return;
+                    }
+                }
+            }
+
+            const stepIndicators = document.getElementById('step-indicators');
+            if (stepIndicators) {
+                for (let i = 0; i < 6; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'w-2 h-2 rounded-full bg-gray-200';
+                    stepIndicators.appendChild(dot);
+                }
+            }
+        }
+
+        // ==================== 页面切换（修复版）====================
+        function showPage(pageId) {
+            // 先强制滚动到顶部（在切换页面之前）
+            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            
+            // 切换页面显示 - 强制设置 display
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none'; // 强制隐藏
+            });
+            
+            const target = document.getElementById(pageId);
+            target.style.display = 'block'; // 强制显示
+            target.classList.add('active');
+            target.scrollTop = 0;
+            
+            // 多重保险机制确保滚动到顶部
+            requestAnimationFrame(() => {
+                window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                target.scrollTop = 0;
+            });
+            
+            setTimeout(() => {
+                window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                target.scrollTop = 0;
+            }, 0);
+            
+            setTimeout(() => {
+                window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                target.scrollTop = 0;
+            }, 100);
+        }
+
+        function startQuiz(continued = false) {
+            showPage('page-quiz');
+            if (!continued) {
+                currentQuestion = 0;
+                answers = new Array(60).fill(null);
+                resetScores();
+            }
+            renderQuestion();
+        }
+
+        function resetScores() {
+            scores = {
+                E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0,
+                Se: 0, Si: 0, Ne: 0, Ni: 0, Te: 0, Ti: 0, Fe: 0, Fi: 0,
+                rational: 0, acceptance: 0, emotion: 0, social: 0, logic: 0
+            };
+        }
+
+        // ==================== 答题逻辑 ====================
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('current-num').textContent = currentQuestion + 1;
+            document.getElementById('total-num').textContent = questions.length;
+            const progress = ((currentQuestion + 1) / questions.length * 100);
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-percent').textContent = Math.round(progress) + '%';
+            document.getElementById('question-text').textContent = q.text;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full option-card p-4 rounded-xl text-left flex items-start gap-4 bg-white border border-gray-100 shadow-sm ${answers[currentQuestion] === idx ? 'selected' : ''}`;
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${answers[currentQuestion] === idx ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-500'}">${String.fromCharCode(65 + idx)}</div>
+                    <span class="text-base leading-relaxed pt-0.5 ${answers[currentQuestion] === idx ? 'text-violet-900 font-medium' : 'text-gray-700'}">${opt.text}</span>
+                `;
+                btn.onclick = () => selectOption(idx);
+                container.appendChild(btn);
+            });
+            
+            updateButtons();
+            saveProgress();
+        }
+
+        function selectOption(idx) {
+            answers[currentQuestion] = idx;
+            renderQuestion();
+            setTimeout(() => {
+                if (currentQuestion < questions.length - 1) {
+                    nextQuestion();
+                } else {
+                    document.getElementById('next-btn').innerHTML = '查看结果 <i class="fas fa-chevron-right"></i>';
+                    document.getElementById('next-btn').disabled = false;
+                    document.getElementById('next-btn').onclick = finishQuiz;
+                }
+            }, 400);
+        }
+
+        function updateButtons() {
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            document.getElementById('prev-btn-header').disabled = currentQuestion === 0;
+            const hasAnswer = answers[currentQuestion] !== null;
+            document.getElementById('next-btn').disabled = !hasAnswer;
+            
+            if (currentQuestion === questions.length - 1 && hasAnswer) {
+                document.getElementById('next-btn').innerHTML = '查看结果 <i class="fas fa-chevron-right"></i>';
+                document.getElementById('next-btn').onclick = finishQuiz;
+            } else {
+                document.getElementById('next-btn').innerHTML = '下一题 <i class="fas fa-chevron-right"></i>';
+                document.getElementById('next-btn').onclick = nextQuestion;
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('mindPrismProgress', JSON.stringify({
+                answers: answers,
+                currentQuestion: currentQuestion,
+                timestamp: Date.now()
+            }));
+        }
+
+        // ==================== 新计分系统：60-600分 ====================
+        function calculateScores() {
+            resetScores();
+            
+            // 第一步：累加原始分数
+            answers.forEach((ansIdx, qIdx) => {
+                if (ansIdx === null) return;
+                const q = questions[qIdx];
+                const opt = q.options[ansIdx];
+                for (let [key, val] of Object.entries(opt.score)) {
+                    if (scores[key] !== undefined) scores[key] += val;
+                }
+            });
+            
+            // 第二步：计算五维心智指数（使用sigmoid函数让分布更均匀）
+            // 理性思考：Ti + Te + Ni + Si
+            const rawRational = (scores.Ti + scores.Te + scores.Ni + scores.Si) / 2;
+            scores.rational = sigmoidNormalize(rawRational, 35, 100);
+            
+            // 自我接纳：Fi + Fe
+            const rawAcceptance = (scores.Fi + scores.Fe) / 1.5 + 15;
+            scores.acceptance = sigmoidNormalize(rawAcceptance, 38, 100);
+            
+            // 情绪管理：Fe + Fi + Ne
+            const rawEmotion = (scores.Fe + scores.Fi + scores.Ne) / 2;
+            scores.emotion = sigmoidNormalize(rawEmotion, 36, 100);
+            
+            // 社交适配：Fe + Se + E
+            const rawSocial = (scores.Fe + scores.Se + scores.E) / 2;
+            scores.social = sigmoidNormalize(rawSocial, 34, 100);
+            
+            // 逻辑格局：Ti + Te + Ni
+            const rawLogic = (scores.Ti + scores.Te + scores.Ni) / 2;
+            scores.logic = sigmoidNormalize(rawLogic, 36, 100);
+        }
+
+        // Sigmoid归一化函数：让分数分布更均匀，避免扎堆
+        function sigmoidNormalize(rawScore, midpoint, maxScore) {
+            // rawScore: 原始分数
+            // midpoint: 中位数（50%的人在此附近）
+            // maxScore: 理论最高分
+            
+            const k = 0.06; // 曲线陡峭度（越小越平缓，分布越均匀）
+            const normalized = maxScore / (1 + Math.exp(-k * (rawScore - midpoint)));
+            return Math.min(100, Math.max(0, Math.round(normalized)));
+        }
+
+        // 计算最终总分（60-600分）
+        function calculateTotalScore() {
+            // 基础参与分60分 + 五维加权分（0-540分）
+            const baseScore = 60;
+            
+            // 加权计算（权重总和=1）
+            const weightedScore = (
+                scores.rational * 0.22 +    // 理性 22%
+                scores.acceptance * 0.18 +  // 接纳 18%
+                scores.emotion * 0.20 +     // 情绪 20%
+                scores.social * 0.20 +      // 社交 20%
+                scores.logic * 0.20         // 逻辑 20%
+            );
+            
+            // 映射到0-540分区间
+            const bonusScore = (weightedScore / 100) * 540;
+            
+            // 最终总分（四舍五入）
+            const totalScore = Math.round(baseScore + bonusScore);
+            
+            // 确保在60-600范围内
+            return Math.min(600, Math.max(60, totalScore));
+        }
+
+        // ==================== 结果计算 ====================
+        function finishQuiz() {
+            showPage('page-loading');
+            calculateScores();
+            
+            const loadingTexts = [
+                { text: "正在计算八维认知功能...", icon: "fa-brain" },
+                { text: "分析人格倾向指数...", icon: "fa-bullseye" },
+                { text: "评估心智发展阶位...", icon: "fa-chart-line" },
+                { text: "生成专属成长路径...", icon: "fa-lightbulb" },
+                { text: "匹配同频灵魂类型...", icon: "fa-users" },
+                { text: "构建可视化雷达图...", icon: "fa-chart-pie" }
+            ];
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 12 + 3;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('loading-bar').style.width = progress + '%';
+                document.getElementById('loading-percent').textContent = Math.floor(progress) + '%';
+                
+                const stepIdx = Math.min(Math.floor(progress / 17), loadingTexts.length - 1);
+                const step = loadingTexts[stepIdx];
+                document.getElementById('loading-text').innerHTML = `<i class="fas ${step.icon} text-violet-500"></i>${step.text}`;
+                document.getElementById('loading-icon').className = `fas ${step.icon} text-white text-4xl`;
+                
+                const indicators = document.getElementById('step-indicators').children;
+                for (let i = 0; i < indicators.length; i++) {
+                    indicators[i].className = i <= stepIdx ? 'w-2 h-2 rounded-full bg-violet-500 w-4' : 'w-2 h-2 rounded-full bg-gray-200';
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(showResults, 500);
+                }
+            }, 250);
+        }
+
+        function getMBTIType() {
+            let type = '';
+            type += scores.E > scores.I ? 'E' : 'I';
+            type += scores.S > scores.N ? 'S' : 'N';
+            type += scores.T > scores.F ? 'T' : 'F';
+            type += scores.J > scores.P ? 'J' : 'P';
+            return type;
+        }
+
+        function showResults() {
+            const mbti = getMBTIType();
+            const data = mbtiData[mbti];
+            
+            // 使用新的计分系统计算总分（60-600分）
+            const totalScore = calculateTotalScore();
+            
+            // 计算能量指数（10-100）
+            let energyScore = Math.round((scores.E * 2 + scores.N * 1.5 + scores.T * 1.2 + scores.J) / 6);
+            energyScore = Math.min(100, Math.max(10, energyScore));
+            
+            // 查找等级配置
+            const stageInfo = stageConfig.find(s => totalScore >= s.min && totalScore <= s.max) || stageConfig[0];
+            
+            // 随机名言
+            const typeQuotes = quotes[mbti] || ["探索自我，发现无限可能。"];
+            const randomQuote = typeQuotes[Math.floor(Math.random() * typeQuotes.length)];
+
+            // 获取等级变体
+            const levelKey = stageInfo.name === "青铜" ? "bronze" : 
+                            stageInfo.name === "白银" ? "silver" :
+                            stageInfo.name === "黄金" ? "gold" :
+                            stageInfo.name === "钻石" ? "diamond" :
+                            stageInfo.name === "王者" ? "king" : "legend";
+            const variant = resultVariants[mbti][levelKey];
+
+            // 填充结果页数据
+            document.getElementById('stage-badge').textContent = stageInfo.badge;
+            document.getElementById('mbti-type').textContent = mbti;
+            document.getElementById('type-nickname').textContent = variant.title;
+            document.getElementById('stage-tag').textContent = stageInfo.stage + '·' + stageInfo.name;
+            document.getElementById('energy-tag').textContent = energyScore > 70 ? '高能级' : energyScore > 40 ? '中能级' : '低能级';
+            document.getElementById('tf-tag').textContent = scores.T > scores.F ? '理性型(T)' : '感性型(F)';
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('energy-score').textContent = energyScore;
+            document.getElementById('golden-quote').textContent = '"' + randomQuote + '"';
+
+            // 根据等级生成不同的灵魂独白
+            const monologues = {
+                "青铜": `${data.monologue}\n\n现在的你，就像一颗沉睡的种子，蕴含着无限的潜能。这个阶段最重要的是认识自己、接纳自己，为未来的成长打下坚实的基础。`,
+                "白银": `${data.monologue}\n\n你正在从沉睡中苏醒，开始意识到自己独特的价值和潜力。这个阶段要勇于尝试，不怕犯错，每一次经历都是成长的养分。`,
+                "黄金": `${data.monologue}\n\n你已经找到了自己的节奏，开始稳定地发挥自己的优势。这个阶段要持续精进，在保持自我的同时，不断拓展能力的边界。`,
+                "钻石": `${data.monologue}\n\n你已经是一颗闪耀的钻石，在特定领域展现出卓越的能力。这个阶段要精益求精，将自己的优势发挥到极致，同时开始影响和帮助他人。`,
+                "王者": `${data.monologue}\n\n你已经站在了心智的巅峰，拥有强大的影响力和领导力。这个阶段要善用你的力量，带领更多人一起成长，创造更大的价值。`,
+                "传奇": `${data.monologue}\n\n你已经达到了心智的化境，成为行业的标杆和精神的引领者。这个阶段要传承智慧，培养后辈，让你的光芒照亮更多人的道路。`
+            };
+            document.getElementById('soul-monologue').textContent = monologues[stageInfo.name];
+
+            // 根据等级生成不同的超能力和高阶特质
+            const powers = {
+                "青铜": { super: `潜在的${data.superPower.slice(0, 15)}...`, trait: "觉醒的潜力，等待被激发" },
+                "白银": { super: `正在发展的${data.superPower.slice(0, 15)}...`, trait: "成长的势头，日益明显" },
+                "黄金": { super: data.superPower, trait: data.highTrait },
+                "钻石": { super: `精进的${data.superPower}`, trait: `成熟的${data.highTrait.slice(0, 10)}...` },
+                "王者": { super: `卓越的${data.superPower}`, trait: `顶尖的${data.highTrait.slice(0, 10)}...` },
+                "传奇": { super: `登峰造极的${data.superPower}`, trait: `化境的${data.highTrait.slice(0, 10)}...` }
+            };
+            document.getElementById('super-power').textContent = powers[stageInfo.name].super;
+            document.getElementById('high-trait').textContent = powers[stageInfo.name].trait;
+
+            document.getElementById('energy-level-text').textContent = energyScore > 70 ? '高能级' : energyScore > 40 ? '中能级' : '低能级';
+            document.getElementById('adapt-index').textContent = Math.round((scores.social + scores.emotion) / 2) + '%';
+            document.getElementById('energy-bar').style.width = energyScore + '%';
+
+            // 根据等级生成不同的能量描述
+            const energyDescs = {
+                "青铜": `作为${stageInfo.name}阶段的你，心理能量还在积累期。建议多关注自己的能量来源，找到让自己充电的方式。`,
+                "白银": `作为${stageInfo.name}阶段的你，心理能量正在稳步增长。注意保持工作与休息的平衡，避免过度消耗。`,
+                "黄金": `作为${stageInfo.name}阶段的你，心理能量已经相当稳定。你能够应对日常挑战，同时保持良好的状态。`,
+                "钻石": `作为${stageInfo.name}阶段的你，心理能量充沛且稳定。你有足够的能量应对复杂挑战，并能影响他人。`,
+                "王者": `作为${stageInfo.name}阶段的你，心理能量处于巅峰状态。你不仅能应对各种挑战，还能带动团队前进。`,
+                "传奇": `作为${stageInfo.name}阶段的你，心理能量已经达到化境。你能够持续输出价值，同时保持内心的平静。`
+            };
+            document.getElementById('energy-desc').textContent = energyDescs[stageInfo.name];
+            
+            const rankNames = ['心智学徒', '心智探索者', '心智进阶者', '心智精英', '心智大师', '心智王者'];
+            const rankIndex = Math.min(stageInfo.star - 1, 5);
+            document.getElementById('rank-title').textContent = rankNames[rankIndex];
+            document.getElementById('rank-star').textContent = '★'.repeat(stageInfo.star) + '☆'.repeat(6 - stageInfo.star);
+            
+            // 根据等级生成不同的高光特质
+            const highlightsByLevel = {
+                "青铜": [
+                    scores.T > scores.F ? "潜在的逻辑分析天赋" : "敏锐的共情与感知潜力",
+                    scores.N > scores.S ? "丰富的想象力" : "务实的观察力",
+                    scores.E > scores.I ? "外向的活力" : "内向的深度",
+                    "对自我探索的开放态度"
+                ],
+                "白银": [
+                    scores.T > scores.F ? "正在觉醒的逻辑能力" : "逐渐成熟的共情力",
+                    scores.N > scores.S ? "抽象思维开始发展" : "细节处理能力提升",
+                    scores.E > scores.I ? "社交能量逐渐释放" : "独立思考能力增强",
+                    "主动成长的意愿"
+                ],
+                "黄金": [
+                    scores.T > scores.F ? "较强的逻辑分析能力" : "良好的共情与感知力",
+                    scores.N > scores.S ? "出色的抽象思维能力" : "务实的细节处理能力",
+                    scores.E > scores.I ? "优秀的社交感染力" : "深度思考与独立性",
+                    "稳定的自我认知"
+                ],
+                "钻石": [
+                    scores.T > scores.F ? "强大的逻辑分析能力" : "敏锐的共情与感知力",
+                    scores.N > scores.S ? "卓越的抽象思维能力" : "精湛的细节处理能力",
+                    scores.E > scores.I ? "出色的社交影响力" : "深刻的独立思考能力",
+                    "专业领域的优势"
+                ],
+                "王者": [
+                    scores.T > scores.F ? "顶尖的逻辑分析能力" : "超凡的共情与洞察力",
+                    scores.N > scores.S ? "卓越的抽象思维能力" : "精妙的细节处理能力",
+                    scores.E > scores.I ? "强大的社交领导力" : "深邃的独立思考能力",
+                    "行业竞争力"
+                ],
+                "传奇": [
+                    scores.T > scores.F ? "登峰造极的逻辑智慧" : "炉火纯青的共情艺术",
+                    scores.N > scores.S ? "超凡的抽象思维能力" : "完美的细节处理能力",
+                    scores.E > scores.I ? "非凡的社交影响力" : "深邃的独立思考能力",
+                    "行业标杆地位"
+                ]
+            };
+            
+            const growthsByLevel = {
+                "青铜": [
+                    "认识并接纳自己的性格特质",
+                    `了解${mbti}类型的优势和盲点`,
+                    "开始记录自己的情绪和行为模式",
+                    `寻找一位${data.soulMate}类型的朋友学习`
+                ],
+                "白银": [
+                    scores.T > scores.F ? "开始有意识地培养情感表达" : "学习基础的逻辑分析方法",
+                    scores.N > scores.S ? "练习将想法转化为具体行动" : "培养长远规划的意识",
+                    scores.E > scores.I ? "学习独处和深度思考的价值" : "逐步拓展社交舒适度",
+                    "建立个人成长的基础习惯"
+                ],
+                "黄金": [
+                    scores.T > scores.F ? "提升情感表达与共情能力" : "加强逻辑与客观分析能力",
+                    scores.N > scores.S ? "关注细节与落地执行能力" : "培养长远战略眼光",
+                    scores.E > scores.I ? "学会独处与深度思考" : "拓展社交与表达能力",
+                    "形成稳定的心智模式"
+                ],
+                "钻石": [
+                    scores.T > scores.F ? "精进情感智慧的深度" : "提升逻辑分析的专业度",
+                    scores.N > scores.S ? "完善执行细节的精度" : "拓展战略视野的广度",
+                    scores.E > scores.I ? "深化独处时的自我对话" : "提升社交影响力的深度",
+                    "在特定领域建立专业优势"
+                ],
+                "王者": [
+                    scores.T > scores.F ? "成为情感智慧的引领者" : "成为逻辑分析的权威专家",
+                    scores.N > scores.S ? "成为执行效率的标杆" : "成为战略规划的典范",
+                    scores.E > scores.I ? "成为社交圈的核心人物" : "成为深度思考的榜样",
+                    "发挥领导力影响和带动他人"
+                ],
+                "传奇": [
+                    "传承智慧，培养后辈",
+                    "探索更高维度的认知边界",
+                    "将个人经验系统化并分享",
+                    "推动整个行业的发展"
+                ]
+            };
+            
+            document.getElementById('highlights').innerHTML = highlightsByLevel[stageInfo.name].map(h => `<li class="flex items-start gap-2 text-sm text-gray-600"><i class="fas fa-check text-green-500 mt-0.5 flex-shrink-0"></i>${h}</li>`).join('');
+            document.getElementById('growth-areas').innerHTML = growthsByLevel[stageInfo.name].map(g => `<li class="flex items-start gap-2 text-sm text-gray-600"><i class="fas fa-chevron-right text-violet-500 mt-0.5 flex-shrink-0"></i>${g}</li>`).join('');
+            
+            // 根据等级生成不同的进化目标和建议
+            const goals = {
+                "青铜": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是认识自己的性格特质，接纳真实的自己。`,
+                    steps: [`1. 阅读关于${mbti}类型的深度解析，了解自己的优势和盲点。`, `2. 每天记录3件让自己感到能量充沛的事情。`, `3. 找一个${data.soulMate}类型的朋友交流，学习他们的长处。`]
+                },
+                "白银": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是将认知转化为行动，开始有意识地发展自己的优势。`,
+                    steps: [`1. 选择一个${data.careers[0]}相关的技能，每天投入30分钟学习。`, `2. 主动承担一个小项目，锻炼自己的${scores.J > scores.P ? '执行力' : '应变能力'}。`, `3. 每周与一位不同类型的人深度交流，拓展认知边界。`]
+                },
+                "黄金": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是整合自己的认知功能，形成稳定的心智模式。`,
+                    steps: [`1. 建立个人知识管理系统，将碎片认知整合成体系。`, `2. 每月完成一个小目标，积累成就感。`, `3. 开始记录"成长日志"，追踪自己的进步轨迹。`]
+                },
+                "钻石": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是精进核心能力，在特定领域建立专业优势。`,
+                    steps: [`1. 选择一个细分领域，深入研究并成为小专家。`, `2. 主动指导一位${stageInfo.name === "钻石" ? "白银/黄金" : "青铜"}阶段的朋友，教学相长。`, `3. 每月输出一篇深度文章或分享，巩固所学。`]
+                },
+                "王者": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是发挥领导力，影响和带动身边的人一起成长。`,
+                    steps: [`1. 发起或主导一个小团队项目，锻炼领导力。`, `2. 建立个人品牌，在社群中分享你的专业见解。`, `3. 寻找一位导师，向更高层次迈进。`]
+                },
+                "传奇": { 
+                    goal: `作为${stageInfo.name}阶段的你，重点是传承智慧，将自己的经验系统化并分享给更多人。`,
+                    steps: [`1. 整理你的心智成长方法论，形成可复制的体系。`, `2. 开设分享会或写作专栏，帮助更多人成长。`, `3. 保持谦逊，持续学习，探索更高维度的认知。`]
+                }
+            };
+            
+            const goalData = goals[stageInfo.name];
+            document.getElementById('stage-goal').textContent = goalData.goal;
+            document.getElementById('action-steps').innerHTML = goalData.steps.map(s => `<div>${s}</div>`).join('');
+            
+            // 根据等级生成不同的场景化适配指南
+            const guides = {
+                "青铜": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，建议从${data.careers.slice(0, 2).join('、')}等入门级岗位开始，重点培养基础技能。避免高压环境，给自己足够的成长空间。`,
+                    relationship: `在${stageInfo.name}阶段，重点是学会认识和表达自己的情感需求。多倾听伴侣的想法，建立基础的沟通模式。`,
+                    social: `${stageInfo.name}阶段的你，建议从1-2个深度关系开始，逐步扩展社交圈。质量永远比数量重要。`
+                },
+                "白银": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，可以尝试${data.careers.slice(0, 3).join('、')}等方向，开始承担更多责任。注意平衡工作与生活。`,
+                    relationship: `在${stageInfo.name}阶段，学习用${scores.T > scores.F ? '理性分析问题但用感性表达关怀' : '感性理解对方但保持自己的边界'}。`,
+                    social: `${stageInfo.name}阶段的你，可以主动参与一些小型社交活动，锻炼自己的${scores.E > scores.I ? '深度连接能力' : '社交舒适度'}。`
+                },
+                "黄金": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，在${data.careers.slice(0, 3).join('、')}等领域已经具备一定竞争力。可以考虑专业化发展或跨领域拓展。`,
+                    relationship: `在${stageInfo.name}阶段，建立稳定的情感支持系统很重要。学会在关系中既保持独立又懂得依赖。`,
+                    social: `${stageInfo.name}阶段的你，已经形成了自己的社交风格。可以主动组织一些活动，发挥你的影响力。`
+                },
+                "钻石": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，在${data.careers[0]}等领域已经具备专业优势。可以考虑带领小团队或指导新人。`,
+                    relationship: `在${stageInfo.name}阶段，你已经有能力经营一段成熟稳定的关系。重点是持续投入和共同成长。`,
+                    social: `${stageInfo.name}阶段的你，在社交中已经能够游刃有余。可以开始建立自己的影响力圈子。`
+                },
+                "王者": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，已经具备行业竞争力。可以考虑创业、晋升管理层或成为领域专家。`,
+                    relationship: `在${stageInfo.name}阶段，你有能力成为关系中的引领者和支持者。重点是找到与你同频的伴侣。`,
+                    social: `${stageInfo.name}阶段的你，已经成为社交圈中的核心人物。善用你的影响力带动他人成长。`
+                },
+                "传奇": {
+                    career: `作为${stageInfo.name}阶段的${mbti}，已经达到了行业顶尖水平。重点是传承智慧、培养后辈、推动行业发展。`,
+                    relationship: `在${stageInfo.name}阶段，你已经实现了情感上的圆满。可以与伴侣共同追求更高层次的精神成长。`,
+                    social: `${stageInfo.name}阶段的你，已经成为行业标杆和精神领袖。用你的智慧照亮更多人的道路。`
+                }
+            };
+            
+            document.getElementById('career-guide').textContent = guides[stageInfo.name].career;
+            document.getElementById('relationship-guide').textContent = guides[stageInfo.name].relationship;
+            document.getElementById('social-guide').textContent = guides[stageInfo.name].social;
+            
+            document.getElementById('soul-mate').textContent = data.soulMate + ' · ' + (mbtiData[data.soulMate]?.nickname || '');
+            document.getElementById('work-partner').textContent = data.workPartner + ' · ' + (mbtiData[data.workPartner]?.nickname || '');
+            document.getElementById('best-friend').textContent = data.bestFriend + ' · ' + (mbtiData[data.bestFriend]?.nickname || '');
+            
+            const colors = ['bg-violet-100 text-violet-700 border-violet-200', 'bg-blue-100 text-blue-700 border-blue-200', 'bg-green-100 text-green-700 border-green-200', 'bg-amber-100 text-amber-700 border-amber-200', 'bg-pink-100 text-pink-700 border-pink-200'];
+            document.getElementById('career-tags').innerHTML = data.careers.map((c, i) => `<span class="px-3 py-1.5 rounded-full text-sm border ${colors[i % colors.length]}">${c}</span>`).join('');
+            
+            // 根据等级生成不同的7天清单
+            const checklistByLevel = {
+                "青铜": [
+                    "记录3件今天让你感到开心的小事",
+                    "找一个安静的地方，独处15分钟",
+                    "向一位朋友询问他们眼中的你是什么样的",
+                    "尝试一种从未吃过的食物",
+                    "写下3个你最欣赏自己的地方",
+                    "观察自己的情绪变化，不评判只记录",
+                    "睡前感谢今天遇到的3个人"
+                ],
+                "白银": [
+                    "记录3个'为什么'并深度思考底层逻辑",
+                    "与一位不同观点者进行建设性对话",
+                    "完成一项拖延已久的任务（哪怕只做5分钟）",
+                    "用思维导图整理一个复杂问题",
+                    "给一位重要的人写一封真诚的感谢信",
+                    "尝试一项从未做过的新事物",
+                    "睡前10分钟冥想，观察自己的思绪"
+                ],
+                "黄金": [
+                    "制定下周的个人成长计划",
+                    "主动帮助一位遇到困难的朋友",
+                    "完成一项挑战自己舒适区的任务",
+                    "写一篇关于自己成长经历的反思",
+                    "学习一个新技能的基础知识",
+                    "与一位榜样人物交流请教",
+                    "制定下个月的3个具体目标"
+                ],
+                "钻石": [
+                    "指导一位后辈，分享你的经验",
+                    "完成一个需要专注2小时的深度工作",
+                    "输出一篇专业领域的文章或分享",
+                    "建立一个新的高效习惯并坚持7天",
+                    "复盘过去一个月的成长与不足",
+                    "主动承担一个团队中的关键任务",
+                    "规划未来3个月的职业发展路径"
+                ],
+                "王者": [
+                    "主导一个小型项目的规划和执行",
+                    "在社群中做一次有价值的分享",
+                    "建立个人知识库并整理核心内容",
+                    "寻找一位更高层次的导师",
+                    "制定影响他人的行动计划",
+                    "完成一个具有挑战性的创新项目",
+                    "总结你的心智成长方法论"
+                ],
+                "传奇": [
+                    "开设一场分享会或线上课程",
+                    "整理你的心智成长体系并出版",
+                    "培养3位可以传承你智慧的弟子",
+                    "发起一个有社会影响力的项目",
+                    "与行业顶尖人物深度交流",
+                    "探索更高维度的认知边界",
+                    "思考如何让你的智慧惠及更多人"
+                ]
+            };
+            
+            const checklistItems = checklistByLevel[stageInfo.name];
+            document.getElementById('checklist').innerHTML = checklistItems.map(item => `
+                <label class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-violet-50 transition-colors">
+                    <input type="checkbox" class="w-5 h-5 rounded border-gray-300 text-violet-500 focus:ring-violet-500">
+                    <span class="text-sm text-gray-700">${item}</span>
+                </label>
+            `).join('');
+
+            document.getElementById('deep-analysis').innerHTML = `<p>${data.deepAnalysis}</p>`;
+            document.getElementById('stress-guide').innerHTML = `<p>${data.stressResponse}</p>`;
+            document.getElementById('communication-style').innerHTML = `<p>${data.communication}</p>`;
+            document.getElementById('learning-tips').innerHTML = `<p>${data.learning}</p>`;
+            
+            // 根据等级生成不同的分享文案
+            const shareTexts = [
+                `我是${mbti}${variant.title}，心智等级${stageInfo.name}（${stageInfo.stage}）。${randomQuote}`,
+                `【心智棱镜测评】觉醒进度${Math.round((totalScore-60)/5.4)}%，当前阶段：${stageInfo.badge}。${variant.subtitle}！`,
+                `测完这个人格测试，我发现自己是${mbti}型${variant.title}（${stageInfo.name}·${stageInfo.stage}）！快来测测你是什么类型吧！`
+            ];
+            
+            document.getElementById('share-texts').innerHTML = shareTexts.map((text, i) => `
+                <div class="p-3 rounded-xl bg-white border border-violet-100 text-sm text-gray-600 relative group">
+                    <button onclick="copyText(this, '${text.replace(/'/g, "\\'")}')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-violet-500 text-white text-xs px-2 py-1 rounded">
+                        复制
+                    </button>
+                    <div class="font-bold text-xs text-violet-600 mb-1">${i === 0 ? '官宣版' : i === 1 ? '星阶版' : '邀请版'}</div>
+                    <div class="pr-16">${text}</div>
+                </div>
+            `).join('');
+
+            showPage('page-result');
+            
+            // 结果页特殊处理 - 确保内容可见
+            setTimeout(() => {
+                const resultPage = document.getElementById('page-result');
+                const hero = document.getElementById('result-hero');
+                if(resultPage) {
+                    resultPage.scrollTop = 0;
+                    resultPage.style.overflowY = 'auto';
+                }
+                if(hero) {
+                    hero.scrollIntoView({behavior: 'auto', block: 'start'});
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                renderCharts(mbti, data, variant, stageInfo);
+            }, 500);
+            
+            localStorage.removeItem('mindPrismProgress');
+        }
+
+        // ==================== 修复：添加 stageInfo 参数 ====================
+        function renderCharts(mbti, data, variant, stageInfo) {
+            // 应用等级修饰符到雷达图数据
+            const radarMod = variant ? variant.radarMod : {};
+            const modFactor = (key) => radarMod[key] || 0.7;
+
+            const mindChart = echarts.init(document.getElementById('radar-mind'));
+            mindChart.setOption({
+                radar: {
+                    indicator: [
+                        {name: '理性思考', max: 100},
+                        {name: '自我接纳', max: 100},
+                        {name: '情绪管理', max: 100},
+                        {name: '社交适配', max: 100},
+                        {name: '逻辑格局', max: 100}
+                    ],
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: {color: '#8b5cf6', fontSize: 11, fontWeight: 500},
+                    splitLine: {lineStyle: {color: 'rgba(139, 92, 246, 0.15)'}},
+                    splitArea: {areaStyle: {color: ['rgba(139, 92, 246, 0.02)', 'rgba(139, 92, 246, 0.05)', 'rgba(139, 92, 246, 0.08)', 'rgba(139, 92, 246, 0.11)']}},
+                    axisLine: {lineStyle: {color: 'rgba(139, 92, 246, 0.2)'}}
+                },
+                series: [{
+                    type: 'radar',
+                    data: [{
+                        value: [
+                            Math.round(scores.rational * (stageInfo.star / 3)),
+                            Math.round(scores.acceptance * (stageInfo.star / 3)),
+                            Math.round(scores.emotion * (stageInfo.star / 3)),
+                            Math.round(scores.social * (stageInfo.star / 3)),
+                            Math.round(scores.logic * (stageInfo.star / 3))
+                        ],
+                        name: '心智指数',
+                        areaStyle: {color: 'rgba(139, 92, 246, 0.25)'},
+                        lineStyle: {color: '#8b5cf6', width: 2.5},
+                        itemStyle: {color: '#8b5cf6', borderWidth: 2, borderColor: '#fff'}
+                    }]
+                }]
+            });
+            
+            const mbtiChart = echarts.init(document.getElementById('radar-mbti'));
+            const starFactor = stageInfo.star / 3;
+            const eScore = Math.min(100, scores.E * 8 * starFactor);
+            const sScore = Math.min(100, scores.S * 8 * starFactor);
+            const tScore = Math.min(100, scores.T * 8 * starFactor);
+            const jScore = Math.min(100, scores.J * 8 * starFactor);
+            
+            mbtiChart.setOption({
+                radar: {
+                    indicator: [
+                        {name: '外向 E', max: 100},
+                        {name: '实感 S', max: 100},
+                        {name: '思考 T', max: 100},
+                        {name: '判断 J', max: 100}
+                    ],
+                    shape: 'circle',
+                    splitNumber: 4,
+                    axisName: {color: '#f59e0b', fontSize: 11, fontWeight: 500},
+                    splitLine: {lineStyle: {color: 'rgba(245, 158, 11, 0.15)'}},
+                    splitArea: {areaStyle: {color: ['rgba(245, 158, 11, 0.02)', 'rgba(245, 158, 11, 0.05)', 'rgba(245, 158, 11, 0.08)', 'rgba(245, 158, 11, 0.11)']}},
+                    axisLine: {lineStyle: {color: 'rgba(245, 158, 11, 0.2)'}}
+                },
+                series: [{
+                    type: 'radar',
+                    data: [{
+                        value: [eScore, sScore, tScore, jScore],
+                        name: '人格倾向',
+                        areaStyle: {color: 'rgba(245, 158, 11, 0.2)'},
+                        lineStyle: {color: '#f59e0b', width: 2.5},
+                        itemStyle: {color: '#f59e0b', borderWidth: 2, borderColor: '#fff'}
+                    }]
+                }]
+            });
+            
+            const cogChart = echarts.init(document.getElementById('radar-cognitive'));
+            const cogData = [
+                {name: 'Se', value: Math.round(scores.Se * modFactor('Se'))},
+                {name: 'Si', value: Math.round(scores.Si * modFactor('Si'))},
+                {name: 'Ne', value: Math.round(scores.Ne * modFactor('Ne'))},
+                {name: 'Ni', value: Math.round(scores.Ni * modFactor('Ni'))},
+                {name: 'Te', value: Math.round(scores.Te * modFactor('Te'))},
+                {name: 'Ti', value: Math.round(scores.Ti * modFactor('Ti'))},
+                {name: 'Fe', value: Math.round(scores.Fe * modFactor('Fe'))},
+                {name: 'Fi', value: Math.round(scores.Fi * modFactor('Fi'))}
+            ];
+            
+            cogChart.setOption({
+                grid: {top: 20, bottom: 30, left: 40, right: 20},
+                xAxis: {
+                    type: 'category',
+                    data: cogData.map(d => d.name),
+                    axisLine: {lineStyle: {color: 'rgba(139, 92, 246, 0.2)'}},
+                    axisLabel: {color: '#8b5cf6', fontSize: 11, fontWeight: 500}
+                },
+                yAxis: {
+                    type: 'value',
+                    max: 60,
+                    splitLine: {lineStyle: {color: 'rgba(139, 92, 246, 0.1)'}},
+                    axisLabel: {color: '#9ca3af', fontSize: 9}
+                },
+                series: [{
+                    type: 'bar',
+                    data: cogData.map(d => ({
+                        value: d.value,
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#8b5cf6'},
+                                {offset: 1, color: 'rgba(139, 92, 246, 0.3)'}
+                            ]),
+                            borderRadius: [4, 4, 0, 0]
+                        }
+                    })),
+                    barWidth: '55%',
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#8b5cf6',
+                        fontSize: 10,
+                        fontWeight: 600,
+                        formatter: '{c}'
+                    }
+                }]
+            });
+            
+            window.addEventListener('resize', () => {
+                mindChart.resize();
+                mbtiChart.resize();
+                cogChart.resize();
+            });
+        }
+
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '已复制';
+                btn.classList.add('bg-green-500');
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('bg-green-500');
+                }, 2000);
+            });
+        }
+
+        function shareReport() {
+            document.getElementById('share-modal').classList.remove('hidden');
+            document.getElementById('share-modal').classList.add('flex');
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.add('hidden');
+            document.getElementById('share-modal').classList.remove('flex');
+        }
+
+        function downloadImage() {
+            const hero = document.getElementById('result-hero');
+            html2canvas(hero, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '心智棱镜-我的结果.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+            closeShareModal();
+        }
+
+        function copyShareText() {
+            const mbti = document.getElementById('mbti-type').textContent;
+            const nickname = document.getElementById('type-nickname').textContent;
+            const quote = document.getElementById('golden-quote').textContent;
+            const text = `我是${mbti}${nickname}！${quote} 快来测测你是什么类型吧！`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已复制到剪贴板！');
+                closeShareModal();
+            });
+        }
+
+        function resetQuiz() {
+            if (confirm('确定要重新开始测评吗？')) {
+                localStorage.removeItem('mindPrismProgress');
+                currentQuestion = 0;
+                answers = new Array(60).fill(null);
+                resetScores();
+                showPage('page-home');
+            }
+        }
+
+        // 快速测试功能
+        function quickTest() {
+            // 随机生成答案
+            for (let i = 0; i < 60; i++) {
+                answers[i] = Math.floor(Math.random() * 2);
+            }
+            finishQuiz();
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
